@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>DP Business Portfolio</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>DP BUSINESS PORTFOLIO</h2>
+      </div>
+      <nav>
+        <a href="#" data-page="dashboard">Dashboard</a>
+        <a href="#" data-page="clients">Clients</a>
+        <a href="#" data-page="leads">Leads</a>
+        <a href="#" data-page="accounting">Accounting</a>
+        <a href="#" data-page="tasks">Tasks</a>
+        <a href="#" data-page="documents">Documents</a>
+        <a href="#" data-page="settings">Settings</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="logo-box"><img src="./assets/logo.png" /></div>
+          <div class="business-info"><span id="business-name">AgoraX Media</span></div>
+        </div>
+        <h1 id="page-title">Dashboard</h1>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section class="page active" id="dashboard">
+        <p>Welcome to DP Business Portfolio</p>
+
+        <!-- COMPLIANCE ALERT WIDGET -->
+        <div id="compliance-alerts" class="alert-box" style="display: none;">
+          <strong>⚠️ Compliance Alert:</strong> <span id="compliance-msg"></span>
+        </div>
+
+        <div class="stats-container">
+          <div class="stat-card">
+            <h3>Total Revenue (Month)</h3>
+            <p id="dashboard-revenue" class="stat-value">$0.00</p>
+          </div>
+          <div class="stat-card">
+            <h3>Net Profit (Month)</h3>
+            <p id="dashboard-profit" class="stat-value">$0.00</p>
+          </div>
+          <div class="stat-card">
+            <h3>Client Count</h3>
+            <p id="dashboard-clients" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Leads Count</h3>
+            <p id="dashboard-leads" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Forecast Revenue</h3>
+            <p id="forecast-revenue" class="stat-value">$0.00</p>
+            <small class="muted">Weighted by probability</small>
+          </div>
+          <div class="stat-card">
+            <h3>Forecasted Clients</h3>
+            <p id="dashboard-forecasted-clients" class="stat-value">0</p>
+            <small class="muted">Likely conversions</small>
+          </div>
+        </div>
+
+        <div class="agency-slogan">
+          <h1>Sri Lanka's First Data-Based Digital Marketing Agency</h1>
+        </div>
+
+        <div class="quick-actions" style="margin-top: 20px;">
+          <h3>Quick Actions</h3>
+          <button class="secondary-btn"
+            onclick="showPage('leads', 'Leads'); document.getElementById('add-lead-btn').click()">+ New Lead</button>
+          <button class="secondary-btn"
+            onclick="showPage('accounting', 'Accounting'); document.querySelector('[data-tab=invoices-tab]').click(); document.getElementById('new-invoice-btn').click()">+
+            New Invoice</button>
+          <button class="secondary-btn"
+            onclick="showPage('accounting', 'Accounting'); document.querySelector('[data-tab=transactions-tab]').click(); document.getElementById('add-txn-btn').click()">+
+            Record Expense</button>
+        </div>
+      </section>
+
+      <!-- CLIENTS -->
+      <section class="page" id="clients">
+        <div class="page-header">
+          <h2>Clients</h2>
+          <button class="primary-btn" id="add-client-btn">Add Client</button>
+        </div>
+        <div class="clients-list">
+          <p>No clients yet.</p>
+        </div>
+      </section>
+
+      <!-- CLIENT DETAIL -->
+      <section class="page" id="client-detail">
+        <div class="page-header">
+          <h2 id="client-detail-name">Client</h2>
+          <div>
+            <button class="primary-btn" id="edit-client-btn">Edit</button>
+            <button class="secondary-btn text-red" id="delete-client-btn">Delete</button>
+            <button class="primary-btn" id="back-to-clients">Back</button>
+          </div>
+        </div>
+
+        <div class="client-detail-card detail-text">
+          <p><strong class="bold">Email:</strong> <span id="detail-email">—</span></p>
+          <p><strong class="bold">Phone:</strong> <span id="detail-phone">—</span></p>
+          <p><strong class="bold">Notes:</strong></p>
+          <p id="detail-notes">—</p>
+        </div>
+
+        <div class="client-activity">
+          <h3>Activity</h3>
+          <ul id="activity-list" class="activity-list">
+            <li class="muted">No activity yet.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- LEADS -->
+      <section class="page" id="leads">
+        <div class="page-header">
+          <h2>Leads</h2>
+          <button class="primary-btn" id="add-lead-btn">Add Lead</button>
+        </div>
+        <div class="leads-list">
+          <p>No leads yet.</p>
+        </div>
+      </section>
+
+      <!-- LEAD DETAIL -->
+      <section class="page" id="lead-detail">
+        <div class="page-header">
+          <h2 id="lead-detail-name">Lead</h2>
+          <div>
+            <button class="primary-btn" id="edit-lead-btn">Edit</button>
+            <button class="primary-btn" id="convert-lead-btn">Convert to Client</button>
+            <button class="primary-btn" id="back-to-leads">Back</button>
+          </div>
+        </div>
+
+        <div class="client-detail-card detail-text">
+          <p><strong class="bold">Email:</strong> <span id="lead-detail-email">—</span></p>
+          <p><strong class="bold">Phone:</strong> <span id="lead-detail-phone">—</span></p>
+          <p><strong class="bold">Status:</strong> <span id="lead-detail-status">—</span></p>
+          <p><strong class="bold">Expected Value:</strong> <span id="lead-detail-value">—</span></p>
+          <p><strong class="bold">Probability:</strong> <span id="lead-detail-prob">—</span></p>
+          <p><strong class="bold">Notes:</strong></p>
+          <p id="lead-detail-notes">—</p>
+        </div>
+      </section>
+
+      <section class="page" id="accounting">
+        <div class="page-header">
+          <h2>Accounting</h2>
+          <div class="filter-bar">
+            <select id="acc-month-filter">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select id="acc-year-filter">
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+            </select>
+            <button class="primary-btn" id="add-txn-btn">Add Transaction</button>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="transactions-tab">Transactions</button>
+          <button class="tab-btn" data-tab="accounts-tab">Chart of Accounts</button>
+          <button class="tab-btn" data-tab="invoices-tab">Invoices</button>
+          <button class="tab-btn" data-tab="inventory-tab">Inventory</button>
+          <button class="tab-btn" data-tab="reports-tab">Reports</button>
+          <button class="tab-btn" data-tab="settings-tab">Settings</button>
+        </div>
+
+        <div id="transactions-tab" class="tab-content active">
+          <div class="transactions-list">
+            <p>Loading transactions...</p>
+          </div>
+        </div>
+
+        <div id="accounts-tab" class="tab-content">
+          <div class="accounts-list">
+            <p>Loading accounts...</p>
+          </div>
+        </div>
+
+        <div id="invoices-tab" class="tab-content">
+          <div class="page-header">
+            <h3>Client Invoices</h3>
+            <button class="primary-btn" id="new-invoice-btn">+ New Invoice</button>
+          </div>
+          <div class="invoices-list">
+            <p>Loading invoices...</p>
+          </div>
+        </div>
+
+        <div id="inventory-tab" class="tab-content">
+          <div class="page-header">
+            <h3>Products & Services</h3>
+            <button class="primary-btn" id="new-product-btn">+ Add Item</button>
+          </div>
+          <div class="inventory-list-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="col-name">Name</th>
+                  <th class="col-type">Type</th>
+                  <th class="col-price">Price</th>
+                  <th class="col-desc">Description</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <tr>
+                  <td colspan="4" class="muted center">No items found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="settings-tab" class="tab-content">
+          <div class="settings-container">
+            <h3>Business Profile</h3>
+            <div class="form-row">
+              <input type="text" id="set-name" placeholder="Business Name">
+              <input type="text" id="set-phone" placeholder="Phone">
+            </div>
+            <input type="text" id="set-address" placeholder="Address">
+            <input type="email" id="set-email" placeholder="Email">
+            <button class="primary-btn" id="save-settings-btn">Save Profile</button>
+
+            <hr>
+            <h3>Data Management <span class="text-red">(Use Caution)</span></h3>
+            <div class="form-row">
+              <button class="secondary-btn" id="backup-btn">Export Backup</button>
+              <button class="secondary-btn text-red" id="restore-btn">Restore Backup</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="reports-tab" class="tab-content">
+          <div class="reports-header">
+            <button class="secondary-btn" id="refresh-reports-btn">Refresh</button>
+            <button class="primary-btn" id="print-tax-btn" onclick="window.print()">Print Tax Pack</button>
+          </div>
+          <div class="reports-container">
+            <!-- Income Statement -->
+            <div class="report-card">
+              <h3>Income Statement</h3>
+              <table class="report-table">
+                <tr>
+                  <td class="row-label">Total Income</td>
+                  <td class="row-value text-green" id="report-income">$0.00</td>
+                </tr>
+                <tr>
+                  <td class="row-label">Total Expenses</td>
+                  <td class="row-value text-red" id="report-expense">$0.00</td>
+                </tr>
+                <tr class="total-row">
+                  <td class="row-label">Net Profit</td>
+                  <td class="row-value" id="report-profit">$0.00</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Balance Sheet -->
+            <div class="report-card">
+              <h3>Balance Sheet (Simplified)</h3>
+              <table class="report-table">
+                <tr>
+                  <td class="row-label">Assets (Cash/Bank)</td>
+                  <td class="row-value text-green" id="report-assets">$0.00</td>
+                </tr>
+                <tr>
+                  <td class="row-label">Liabilities</td>
+                  <td class="row-value text-red" id="report-liabilities">$0.00</td>
+                </tr>
+                <tr class="total-row">
+                  <td class="row-label">Equity (Retained Earnings)</td>
+                  <td class="row-value text-blue" id="report-equity">$0.00</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Tax Summary (Schedule C) -->
+            <div class="report-card full-width">
+              <h3>Tax Summary (Schedule C Helper)</h3>
+              <p class="detail-text muted">Expenses grouped by IRS Tax Lines</p>
+              <table class="data-table" id="tax-report-table">
+                <thead>
+                  <tr>
+                    <th>Tax Category</th>
+                    <th style="text-align: right;">Total Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="tax-report-list">
+                  <tr>
+                    <td colspan="2" class="muted center">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="corporate">
+        <div class="page-header">
+          <h2>Corporate Structure</h2>
+          <button class="primary-btn" id="add-doc-btn">Add Document</button>
+        </div>
+        <div class="docs-list">
+          <p>Loading documents...</p>
+        </div>
+      </section>
+      <section class="page" id="tasks">
+        <p>Tasks page</p>
+      </section>
+      <section class="page" id="documents">
+        <div class="page-header">
+          <h2>Client Documents</h2>
+          <div>
+            <button class="primary-btn" id="add-client-doc-btn" style="display:none">+ Add Document</button>
+          </div>
+        </div>
+        <div class="docs-container">
+          <div class="client-selector" id="doc-client-list">
+            <!-- Populated by JS -->
+            <p class="muted center" style="padding: 20px;">Loading clients...</p>
+          </div>
+          <div class="doc-manager-main" id="doc-manager-content">
+            <div class="no-selection">
+              <p>Select a client to manage their documents</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="page" id="settings">
+        <div class="page-header">
+          <h2>General Settings</h2>
+        </div>
+        <div class="card" style="max-width: 600px;">
+          <h3>Preferences</h3>
+          <div class="form-group">
+            <label>Language</label>
+            <select id="pref-lang">
+              <option value="en">English</option>
+              <option value="fr">French</option>
+              <option value="es">Spanish</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Theme</label>
+            <select id="pref-theme">
+              <option value="light">Light (Standard)</option>
+              <option value="dark">Dark (Coming Soon)</option>
+            </select>
+          </div>
+          <hr style="margin: 20px 0;">
+          <h3>Notifications</h3>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px;">
+            <input type="checkbox" checked> Email notifications for alerts
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 14px; margin-top: 10px;">
+            <input type="checkbox" checked> Desktop notifications
+          </label>
+          <hr style="margin: 20px 0;">
+          <h3>System</h3>
+          <p class="detail-text">Version 1.2.0 (Stable)</p>
+          <button class="secondary-btn" style="margin-top: 10px;" onclick="alert('Checking for updates...')">Check for
+            Updates</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CLIENT MODAL -->
+  <div id="add-client-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add / Edit Client</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name*</label>
+          <input type="text" id="client-name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="client-email">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" id="client-phone">
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="client-notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-client-btn">Save Client</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAD MODAL -->
+  <div id="add-lead-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add / Edit Lead</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name*</label>
+          <input type="text" id="lead-name">
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="lead-email">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="lead-phone">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="lead-status">
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Proposal">Proposal</option>
+              <option value="Nurturing">Nurturing</option>
+              <option value="Converted">Converted</option>
+              <option value="Lost">Lost</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Est. Value</label>
+            <input type="number" id="lead-value" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Prob (%)</label>
+            <input type="number" id="lead-prob" placeholder="0-100">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="lead-notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-lead-btn">Save Lead</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION MODAL -->
+  <div id="add-txn-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Record Transaction</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Type</label>
+            <select id="txn-type">
+              <option value="Income">Income / Sale</option>
+              <option value="Expense">Expense / Purchase</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="txn-date">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Account</label>
+          <select id="txn-account">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="txn-desc">
+        </div>
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" id="txn-amount" step="0.01">
+        </div>
+        <div class="form-group" id="txn-client-field">
+          <label>Client (Optional)</label>
+          <select id="txn-client"></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-txn-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCUMENT MODAL -->
+  <div id="add-doc-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Corporate Document</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name*</label>
+          <input type="text" id="doc-name">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="doc-type">
+            <option value="Legal">Legal</option>
+            <option value="Tax">Tax</option>
+            <option value="Compliance">Compliance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="doc-expiry">
+        </div>
+        <div class="form-group">
+          <label>Notes / File Path</label>
+          <textarea id="doc-notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-doc-btn">Save Document</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVOICE MODAL -->
+  <div id="invoice-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3>New Invoice</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Client*</label>
+            <select id="inv-client"></select>
+          </div>
+          <div class="form-group">
+            <label>Number</label>
+            <input type="text" id="inv-number">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="inv-date">
+          </div>
+          <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="inv-due-date">
+          </div>
+        </div>
+        <hr>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="inv-items-body"></tbody>
+        </table>
+        <button class="secondary-btn small" id="add-inv-item-btn" style="margin-top:10px;">+ Add Item</button>
+        <div style="text-align: right; margin-top:20px;">
+          <p class="bold">Total Due: LKR <span id="inv-total">0.00</span></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-invoice-btn">Create Invoice</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVOICE VIEW MODAL (Printable) -->
+  <div class="modal" id="view-invoice-modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3>Invoice Details</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body printable">
+        <div class="inv-header">
+          <h2 id="view-inv-number">INV-???</h2>
+          <span class="status-badge" id="view-inv-status">Draft</span>
+        </div>
+        <div class="inv-meta">
+          <p><strong>To:</strong> <span id="view-inv-client">Client Name</span></p>
+          <p><strong>Date:</strong> <span id="view-inv-date"></span></p>
+          <p><strong>Due:</strong> <span id="view-inv-due"></span></p>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="view-inv-items"></tbody>
+        </table>
+        <div style="text-align: right; margin-top:20px;">
+          <h3 class="bold">Total: <span id="view-inv-total">LKR 0.00</span></h3>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="window.print()">Print</button>
+        <button class="primary-btn" id="mark-paid-btn">Mark as Paid</button>
+        <button class="secondary-btn" id="close-view-inv">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add / Edit Product or Service</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prod-id" />
+        <div class="form-group">
+          <label>Name*</label>
+          <input type="text" id="prod-name">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="prod-type">
+            <option value="Service">Service</option>
+            <option value="Product">Product</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" id="prod-price" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="prod-desc"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-product-btn">Save Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT DOCUMENT MODAL -->
+  <div id="add-client-doc-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Client Document</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Document Name*</label>
+          <input type="text" id="client-doc-name">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="client-doc-type">
+            <option value="Contract">Contract</option>
+            <option value="Invoice">Invoice</option>
+            <option value="ID/Identity">ID / Identity</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="client-doc-notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-client-doc-btn">Save Document</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const { ipcRenderer } = require("electron");
+
+      // App State
+      const state = {
+        selectedClient: null,
+        selectedLead: null,
+        selectedDocClient: null,
+        currentInvoices: [],
+        isEditMode: false
+      };
+
+      // UI Elements - Navigation
+      const pages = document.querySelectorAll(".page");
+      const title = document.getElementById("page-title");
+      const sidebarLinks = document.querySelectorAll(".sidebar nav a");
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      // UI Elements - Modals
+      const clientModal = document.getElementById("add-client-modal");
+      const leadModal = document.getElementById("add-lead-modal");
+      const txnModal = document.getElementById("add-txn-modal");
+      const txnType = document.getElementById("txn-type");
+      const docModal = document.getElementById("add-doc-modal");
+      const invModal = document.getElementById("invoice-modal");
+      const invViewModal = document.getElementById("view-invoice-modal");
+      const prodModal = document.getElementById("product-modal");
+      const clientDocModal = document.getElementById("add-client-doc-modal");
+
+      /* ===================== MODAL HELPERS ===================== */
+
+      function resetForm(modalId) {
+        const m = document.getElementById(modalId);
+        if (!m) return;
+        m.querySelectorAll("input, textarea, select").forEach(i => {
+          if (i.type === "hidden") return;
+          i.value = "";
+        });
+      }
+
+      window.closeAllModals = () => {
+        document.querySelectorAll(".modal.active").forEach(m => m.classList.remove("active"));
+      };
+
+      // Close on background click
+      document.querySelectorAll(".modal").forEach(m => {
+        m.onclick = (e) => {
+          if (e.target === m) m.classList.remove("active");
+        };
+      });
+
+      // Unified Success Handler
+      const refreshEvents = [
+        "client-saved", "client-updated", "client-deleted", "lead-saved", "lead-updated",
+        "transaction-saved", "transaction-deleted", "invoice-saved", "invoice-paid-success", "invoice-deleted",
+        "product-saved", "product-deleted", "document-saved", "client-document-saved", "client-document-deleted", "settings-saved"
+      ];
+      refreshEvents.forEach(ev => ipcRenderer.on(ev, () => {
+        closeAllModals();
+        const activePage = document.querySelector(".page.active").id;
+        showPage(activePage);
+        if (ev === "settings-saved") alert("Settings Saved");
+      }));
+
+      /* ===================== NAVIGATION ===================== */
+
+      window.showPage = function (id, text) {
+        pages.forEach(p => p.classList.remove("active"));
+        const targetPage = document.getElementById(id);
+        if (targetPage) targetPage.classList.add("active");
+        if (text) title.textContent = text;
+
+        // Data fetching based on page
+        if (id === "dashboard") ipcRenderer.send("get-dashboard-stats", 1);
+        if (id === "clients") ipcRenderer.send("get-clients", 1);
+        if (id === "leads") ipcRenderer.send("get-leads", 1);
+        if (id === "corporate") ipcRenderer.send("get-documents", 1);
+        if (id === "documents") ipcRenderer.send("get-clients", 1);
+        if (id === "accounting") {
+          refreshAccountingData();
+        }
+      };
+
+      function refreshAccountingData() {
+        const month = parseInt(document.getElementById("acc-month-filter").value);
+        const year = parseInt(document.getElementById("acc-year-filter").value);
+        const reqData = { businessId: 1, month, year };
+
+        ipcRenderer.send("get-accounts", 1);
+        ipcRenderer.send("get-transactions", reqData);
+        ipcRenderer.send("get-clients", 1);
+        ipcRenderer.send("get-invoices", 1);
+        ipcRenderer.send("get-financial-reports", reqData);
+        ipcRenderer.send("get-tax-report", 1);
+        ipcRenderer.send("get-products", 1);
+        ipcRenderer.send("get-settings", 1);
+      }
+
+      document.getElementById("acc-month-filter").onchange = refreshAccountingData;
+      document.getElementById("acc-year-filter").onchange = refreshAccountingData;
+
+      sidebarLinks.forEach(link => {
+        link.onclick = (e) => {
+          e.preventDefault();
+          showPage(link.dataset.page, link.textContent);
+        };
+      });
+
+      tabBtns.forEach(btn => {
+        btn.onclick = () => {
+          tabBtns.forEach(b => b.classList.remove("active"));
+          tabContents.forEach(c => c.classList.remove("active"));
+          btn.classList.add("active");
+          const targetTab = document.getElementById(btn.dataset.tab);
+          if (targetTab) targetTab.classList.add("active");
+
+          // Selective refresh on tab change
+          if (btn.dataset.tab === "reports-tab") {
+            ipcRenderer.send("get-financial-reports", 1);
+            ipcRenderer.send("get-tax-report", 1);
+          }
+          if (btn.dataset.tab === "invoices-tab") ipcRenderer.send("get-invoices", 1);
+          if (btn.dataset.tab === "inventory-tab") ipcRenderer.send("get-products", 1);
+          if (btn.dataset.tab === "settings-tab") ipcRenderer.send("get-settings", 1);
+          if (btn.dataset.tab === "transactions-tab") ipcRenderer.send("get-transactions", 1);
+        };
+      });
+
+      /* ===================== CLIENTS ===================== */
+
+      document.getElementById("add-client-btn").onclick = () => {
+        state.isEditMode = false;
+        resetForm("add-client-modal");
+        clientModal.classList.add("active");
+      };
+
+      document.getElementById("edit-client-btn").onclick = () => {
+        if (!state.selectedClient) return;
+        state.isEditMode = true;
+        document.getElementById("client-name").value = state.selectedClient.name;
+        document.getElementById("client-email").value = state.selectedClient.email || "";
+        document.getElementById("client-phone").value = state.selectedClient.phone || "";
+        document.getElementById("client-notes").value = state.selectedClient.notes || "";
+        clientModal.classList.add("active");
+      };
+
+      document.getElementById("delete-client-btn").onclick = () => {
+        if (!state.selectedClient) return;
+        if (confirm(`Are you sure you want to delete ${state.selectedClient.name}? This cannot be undone.`)) {
+          ipcRenderer.send("delete-client", state.selectedClient.id);
+        }
+      };
+
+      document.getElementById("save-client-btn").onclick = () => {
+        const name = document.getElementById("client-name").value.trim();
+        if (!name) return alert("Name required");
+        const data = {
+          name,
+          email: document.getElementById("client-email").value.trim(),
+          phone: document.getElementById("client-phone").value.trim(),
+          notes: document.getElementById("client-notes").value.trim()
+        };
+        if (state.isEditMode && state.selectedClient) {
+          ipcRenderer.send("update-client", { ...data, id: state.selectedClient.id });
+        } else {
+          ipcRenderer.send("save-client", { business_id: 1, ...data });
+        }
+      };
+
+      document.getElementById("back-to-clients").onclick = () => showPage("clients", "Clients");
+
+      /* ===================== LEADS ===================== */
+
+      document.getElementById("add-lead-btn").onclick = () => {
+        state.isEditMode = false;
+        resetForm("add-lead-modal");
+        leadModal.classList.add("active");
+      };
+
+      document.getElementById("edit-lead-btn").onclick = () => {
+        if (!state.selectedLead) return;
+        state.isEditMode = true;
+        document.getElementById("lead-name").value = state.selectedLead.name;
+        document.getElementById("lead-email").value = state.selectedLead.email || "";
+        document.getElementById("lead-phone").value = state.selectedLead.phone || "";
+        document.getElementById("lead-status").value = state.selectedLead.status || "New";
+        document.getElementById("lead-value").value = state.selectedLead.expected_value || "";
+        document.getElementById("lead-prob").value = state.selectedLead.probability || "";
+        document.getElementById("lead-notes").value = state.selectedLead.notes || "";
+        leadModal.classList.add("active");
+      };
+
+      document.getElementById("save-lead-btn").onclick = () => {
+        const name = document.getElementById("lead-name").value.trim();
+        if (!name) return alert("Name required");
+        const data = {
+          business_id: 1,
+          name,
+          email: document.getElementById("lead-email").value.trim(),
+          phone: document.getElementById("lead-phone").value.trim(),
+          status: document.getElementById("lead-status").value,
+          expected_value: parseFloat(document.getElementById("lead-value").value) || 0,
+          probability: parseInt(document.getElementById("lead-prob").value) || 0,
+          notes: document.getElementById("lead-notes").value.trim()
+        };
+        if (state.isEditMode && state.selectedLead) {
+          ipcRenderer.send("update-lead", { ...data, id: state.selectedLead.id });
+        } else {
+          ipcRenderer.send("save-lead", data);
+        }
+      };
+
+      document.getElementById("back-to-leads").onclick = () => showPage("leads", "Leads");
+
+      document.getElementById("convert-lead-btn").onclick = () => {
+        if (!state.selectedLead) return;
+        ipcRenderer.send("save-client", {
+          business_id: 1,
+          name: state.selectedLead.name,
+          email: state.selectedLead.email,
+          phone: state.selectedLead.phone,
+          notes: state.selectedLead.notes
+        });
+        ipcRenderer.send("update-lead", { ...state.selectedLead, status: "Converted" });
+      };
+
+      /* ===================== DASHBOARD ===================== */
+      // Dashboard stats handled via IPC listener below
+
+      /* ===================== ACCOUNTING ===================== */
+
+      // Transactions
+      document.getElementById("add-txn-btn").onclick = () => {
+        resetForm("add-txn-modal");
+        document.getElementById("txn-date").valueAsDate = new Date();
+        document.getElementById("txn-type").value = "Income";
+        updateAccountOptions();
+        txnModal.classList.add("active");
+      };
+
+      txnType.onchange = () => updateAccountOptions();
+
+      function updateAccountOptions() {
+        const type = document.getElementById("txn-type").value;
+        const txnAccount = document.getElementById("txn-account");
+        const txnClient = document.getElementById("txn-client");
+        Array.from(txnAccount.options).forEach(opt => {
+          if (opt.value === "") return;
+          opt.style.display = opt.dataset.type === type ? "block" : "none";
+        });
+        txnAccount.value = "";
+        txnClient.style.display = type === "Income" ? "block" : "none";
+      }
+
+      document.getElementById("save-txn-btn").onclick = () => {
+        const description = document.getElementById("txn-desc").value.trim();
+        const amount = parseFloat(document.getElementById("txn-amount").value);
+        const account_id = document.getElementById("txn-account").value;
+        if (!description || !amount || !account_id) return alert("Missing fields");
+
+        ipcRenderer.send("save-transaction", {
+          business_id: 1,
+          date: document.getElementById("txn-date").value,
+          description,
+          amount,
+          type: document.getElementById("txn-type").value,
+          account_id,
+          client_id: document.getElementById("txn-client").value
+        });
+      };
+
+      // Invoices
+      document.getElementById("new-invoice-btn").onclick = () => {
+        resetForm("invoice-modal");
+        document.getElementById("inv-number").value = "INV-" + Date.now().toString().slice(-4);
+        document.getElementById("inv-date").valueAsDate = new Date();
+        document.getElementById("inv-due-date").valueAsDate = new Date(Date.now() + 14 * 86400000);
+        document.getElementById("inv-items-body").innerHTML = "";
+        document.getElementById("inv-total").textContent = "0.00";
+        ipcRenderer.send("get-clients", 1);
+        invModal.classList.add("active");
+      };
+
+      document.getElementById("add-inv-item-btn").onclick = () => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input type="text" class="inv-desc" placeholder="Description"></td>
+          <td><input type="number" class="inv-qty" value="1" min="1" style="width: 60px;"></td>
+          <td><input type="number" class="inv-price" value="0.00" min="0" step="0.01" style="width: 100px;"></td>
+          <td>LKR <span class="inv-row-total">0.00</span></td>
+          <td><button class="text-red remove-row-btn">&times;</button></td>
+        `;
+        document.getElementById("inv-items-body").appendChild(row);
+        row.querySelectorAll("input").forEach(i => i.oninput = updateInvTotal);
+        row.querySelector(".remove-row-btn").onclick = () => { row.remove(); updateInvTotal(); };
+      };
+
+      function updateInvTotal() {
+        let total = 0;
+        document.querySelectorAll("#inv-items-body tr").forEach(row => {
+          const q = parseFloat(row.querySelector(".inv-qty").value) || 0;
+          const p = parseFloat(row.querySelector(".inv-price").value) || 0;
+          const sub = q * p;
+          row.querySelector(".inv-row-total").textContent = sub.toFixed(2);
+          total += sub;
+        });
+        document.getElementById("inv-total").textContent = total.toFixed(2);
+      }
+
+      document.getElementById("save-invoice-btn").onclick = () => {
+        const client_id = document.getElementById("inv-client").value;
+        const invoice_number = document.getElementById("inv-number").value;
+        if (!client_id || !invoice_number) return alert("Missing fields");
+        const items = Array.from(document.querySelectorAll("#inv-items-body tr")).map(row => ({
+          description: row.querySelector(".inv-desc").value,
+          quantity: parseFloat(row.querySelector(".inv-qty").value),
+          unit_price: parseFloat(row.querySelector(".inv-price").value)
+        }));
+        if (!items.length) return alert("Add items");
+
+        ipcRenderer.send("save-invoice", {
+          business_id: 1, client_id, invoice_number,
+          date: document.getElementById("inv-date").value,
+          due_date: document.getElementById("inv-due-date").value,
+          items, notes: ""
+        });
+      };
+
+      document.getElementById("close-view-inv").onclick = () => invViewModal.classList.remove("active");
+
+      // Inventory
+      document.getElementById("new-product-btn").onclick = () => {
+        resetForm("product-modal");
+        prodModal.classList.add("active");
+      };
+
+      document.getElementById("save-product-btn").onclick = () => {
+        const name = document.getElementById("prod-name").value.trim();
+        if (!name) return alert("Name required");
+        ipcRenderer.send("save-product", {
+          business_id: 1,
+          id: document.getElementById("prod-id").value,
+          name,
+          type: document.getElementById("prod-type").value,
+          price: parseFloat(document.getElementById("prod-price").value) || 0,
+          description: document.getElementById("prod-desc").value.trim()
+        });
+      };
+
+      /* ===================== CORPORATE & SETTINGS ===================== */
+
+      document.getElementById("add-doc-btn").onclick = () => {
+        resetForm("add-doc-modal");
+        docModal.classList.add("active");
+      };
+
+      document.getElementById("save-doc-btn").onclick = () => {
+        const name = document.getElementById("doc-name").value.trim();
+        if (!name) return alert("Name required");
+        ipcRenderer.send("save-document", {
+          business_id: 1,
+          name,
+          type: document.getElementById("doc-type").value,
+          notes: document.getElementById("doc-notes").value.trim(),
+          expiry_date: document.getElementById("doc-expiry").value || null
+        });
+      };
+
+
+      /* ===================== CLIENT DOCUMENTS ===================== */
+      document.getElementById("add-client-doc-btn").onclick = () => {
+        if (!state.selectedDocClient) return;
+        resetForm("add-client-doc-modal");
+        clientDocModal.classList.add("active");
+      };
+
+      document.getElementById("save-client-doc-btn").onclick = () => {
+        const name = document.getElementById("client-doc-name").value.trim();
+        if (!name) return alert("Document name required");
+        ipcRenderer.send("save-client-document", {
+          client_id: state.selectedDocClient.id,
+          name,
+          type: document.getElementById("client-doc-type").value,
+          notes: document.getElementById("client-doc-notes").value.trim()
+        });
+      };
+
+      window.deleteClientDoc = (id) => {
+        if (confirm("Delete this document?")) ipcRenderer.send("delete-client-document", id);
+      };
+
+      document.getElementById("save-settings-btn").onclick = () => {
+        ipcRenderer.send("save-settings", {
+          business_name: document.getElementById("set-name").value,
+          phone: document.getElementById("set-phone").value,
+          address: document.getElementById("set-address").value,
+          email: document.getElementById("set-email").value
+        });
+      };
+
+      document.getElementById("backup-btn").onclick = () => ipcRenderer.send("backup-data");
+      document.getElementById("restore-btn").onclick = () => {
+        if (confirm("Overwrite current data?")) ipcRenderer.send("restore-data");
+      };
+
+      /* ===================== IPC HANDLERS ===================== */
+
+      ipcRenderer.on("business-data", (_, d) => {
+        const el = document.getElementById("business-name");
+        if (el) el.textContent = d?.name || "DP Portfolio";
+      });
+
+      ipcRenderer.on("dashboard-stats", (_, stats) => {
+        const setVal = (id, val, isCurrency = true) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (isCurrency) {
+            el.textContent = `LKR ${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+          } else {
+            el.textContent = val.toLocaleString();
+          }
+        };
+
+        setVal("dashboard-revenue", stats.revenue || 0);
+        setVal("dashboard-profit", stats.profit || 0);
+        setVal("dashboard-clients", stats.clients || 0, false);
+        setVal("dashboard-leads", stats.leads || 0, false);
+        setVal("forecast-revenue", stats.forecast || 0);
+        setVal("dashboard-forecasted-clients", stats.forecasted_clients || 0, false);
+
+        const profitEl = document.getElementById("dashboard-profit");
+        if (profitEl) profitEl.className = `stat-value ${stats.profit >= 0 ? "text-green" : "text-red"}`;
+      });
+
+      ipcRenderer.on("clients-data", (_, clients) => {
+        // List rendering
+        const list = document.querySelector(".clients-list");
+        if (list) {
+          list.innerHTML = clients.length ? "" : "<p>No clients yet.</p>";
+          clients.forEach(c => {
+            const card = document.createElement("div");
+            card.className = "client-card";
+            card.innerHTML = `<h4 class="bold">${c.name}</h4>`;
+            card.onclick = () => ipcRenderer.send("get-client-by-id", c.id);
+            list.appendChild(card);
+          });
+        }
+        // Dropdowns
+        ["txn-client", "inv-client"].forEach(id => {
+          const select = document.getElementById(id);
+          if (select) {
+            const val = select.value;
+            select.innerHTML = `<option value="">Select Client${id === "txn-client" ? " (Optional)" : ""}</option>`;
+            clients.forEach(c => {
+              const opt = document.createElement("option");
+              opt.value = c.id;
+              opt.textContent = c.name;
+              select.appendChild(opt);
+            });
+            select.value = val;
+          }
+        });
+        // Document Page Client List
+        const docList = document.getElementById("doc-client-list");
+        if (docList) {
+          docList.innerHTML = clients.map(c => `
+             <div class="client-doc-item ${state.selectedDocClient?.id === c.id ? 'active' : ''}" onclick="selectDocClient(${c.id})">
+               <h4 class="bold">${c.name}</h4>
+             </div>
+           `).join("");
+        }
+      });
+
+      window.selectDocClient = (id) => {
+        ipcRenderer.send("get-client-by-id-for-docs", id);
+      };
+
+      ipcRenderer.on("client-data-for-docs", (_, c) => {
+        state.selectedDocClient = c;
+        document.querySelectorAll(".client-doc-item").forEach(i => i.classList.remove("active"));
+        // Mark active in list if possible or just refresh
+        document.getElementById("add-client-doc-btn").style.display = "inline-block";
+        const content = document.getElementById("doc-manager-content");
+        content.innerHTML = `<h3>Documents for ${c.name}</h3><div id="client-docs-list" class="muted">Loading documents...</div>`;
+        ipcRenderer.send("get-client-documents", c.id);
+      });
+
+      ipcRenderer.on("client-documents-data", (_, docs) => {
+        const list = document.getElementById("client-docs-list");
+        if (!list) return;
+        list.className = "";
+        if (!docs.length) {
+          list.innerHTML = "<p class='muted'>No documents for this client yet.</p>";
+          return;
+        }
+        list.innerHTML = `
+           <table class="data-table">
+             <thead><tr><th>Name</th><th>Type</th><th>Added</th><th>Actions</th></tr></thead>
+             <tbody>
+               ${docs.map(d => `
+                 <tr>
+                   <td class="bold">${d.name}</td>
+                   <td>${d.type || 'Other'}</td>
+                   <td class="detail-text">${new Date(d.created_at).toLocaleDateString()}</td>
+                   <td>
+                     <button class="secondary-btn small" onclick="alert('View functionality would open: ${d.file_path || "N/A"}')">View</button>
+                     <button class="text-red" onclick="deleteClientDoc(${d.id})">&times;</button>
+                   </td>
+                 </tr>
+               `).join("")}
+             </tbody>
+           </table>
+         `;
+      });
+
+      ipcRenderer.on("client-data", (_, c) => {
+        state.selectedClient = c;
+        showPage("client-detail", "Client");
+        document.getElementById("client-detail-name").textContent = c.name;
+        document.getElementById("detail-email").textContent = c.email || "—";
+        document.getElementById("detail-phone").textContent = c.phone || "—";
+        document.getElementById("detail-notes").textContent = c.notes || "—";
+        ipcRenderer.send("get-client-activity", c.id);
+      });
+
+      ipcRenderer.on("client-activity-data", (_, activities) => {
+        const list = document.getElementById("activity-list");
+        if (list) {
+          list.innerHTML = activities?.length ? activities.map(a => `
+            <li class="activity-item detail-text">
+              <div class="bold">${a.action}</div>
+              <small class="muted">${new Date(a.created_at).toLocaleString()}</small>
+            </li>`).join("") : `<li class="muted detail-text">No activity yet.</li>`;
+        }
+      });
+
+      ipcRenderer.on("leads-data", (_, leads) => {
+        const list = document.querySelector(".leads-list");
+        if (!list) return;
+        list.innerHTML = leads.length ? "" : "<p>No leads yet.</p>";
+        leads.forEach(l => {
+          const card = document.createElement("div");
+          card.className = "lead-card";
+          const val = l.expected_value ? `LKR ${l.expected_value.toLocaleString()}` : "LKR 0";
+          card.innerHTML = `
+            <h4 class="bold">${l.name}</h4>
+            <div class="meta-row detail-text">
+              <span>${l.status || "New"}</span>
+              <span class="muted">${val} @ ${l.probability || 0}%</span>
+            </div>`;
+          card.onclick = () => ipcRenderer.send("get-lead-by-id", l.id);
+          list.appendChild(card);
+        });
+      });
+
+      ipcRenderer.on("lead-data", (_, lead) => {
+        if (!lead) return;
+        state.selectedLead = lead;
+        showPage("lead-detail", "Lead");
+        document.getElementById("lead-detail-name").textContent = lead.name;
+        document.getElementById("lead-detail-email").textContent = lead.email || "—";
+        document.getElementById("lead-detail-phone").textContent = lead.phone || "—";
+        document.getElementById("lead-detail-status").textContent = lead.status || "New";
+        document.getElementById("lead-detail-value").textContent = lead.expected_value ? `LKR ${lead.expected_value.toLocaleString()}` : "LKR 0";
+        document.getElementById("lead-detail-prob").textContent = `${lead.probability || 0}%`;
+        document.getElementById("lead-detail-notes").textContent = lead.notes || "—";
+        const btn = document.getElementById("convert-lead-btn");
+        btn.disabled = lead.status === "Converted";
+        btn.textContent = lead.status === "Converted" ? "Converted ✅" : "Convert to Client";
+      });
+
+      ipcRenderer.on("accounts-data", (_, accounts) => {
+        const list = document.querySelector(".accounts-list");
+        const select = document.getElementById("txn-account");
+        if (list) list.innerHTML = "";
+        if (select) select.innerHTML = '<option value="">Select Account</option>';
+        const grouped = {};
+        accounts.forEach(a => {
+          if (!grouped[a.type]) grouped[a.type] = [];
+          grouped[a.type].push(a);
+          if (select) {
+            const opt = document.createElement("option");
+            opt.value = a.id; opt.textContent = a.name; opt.dataset.type = a.type;
+            select.appendChild(opt);
+          }
+        });
+        if (list) {
+          for (const [type, accs] of Object.entries(grouped)) {
+            const group = document.createElement("div");
+            group.innerHTML = `<h3 class="bold">${type}</h3>`;
+            accs.forEach(a => {
+              const div = document.createElement("div");
+              div.className = "account-item detail-text";
+              div.textContent = a.name;
+              group.appendChild(div);
+            });
+            list.appendChild(group);
+          }
+        }
+      });
+
+      ipcRenderer.on("transactions-data", (_, txns) => {
+        const list = document.querySelector(".transactions-list");
+        if (!list) return;
+        if (!txns.length) { list.innerHTML = "<p>No transactions yet.</p>"; return; }
+        list.innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Desc</th><th>Account</th><th>Amount</th><th></th></tr></thead>
+            <tbody>
+              ${txns.map(t => `
+                <tr>
+                  <td class="detail-text">${new Date(t.date).toLocaleDateString()}</td>
+                  <td>${t.description} ${t.client_name ? `<span class="detail-text">(${t.client_name})</span>` : ''}</td>
+                  <td class="detail-text">${t.account_name}</td>
+                  <td class="${t.type === 'Income' ? 'text-green' : 'text-red'} bold">
+                    ${t.type === 'Income' ? '+' : '-'}LKR ${t.amount.toFixed(2)}
+                  </td>
+                  <td><button class="text-red" onclick="deleteTransaction(${t.id})">&times;</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+      });
+
+      window.deleteTransaction = (id) => {
+        if (confirm("Delete this transaction?")) ipcRenderer.send("delete-transaction", id);
+      };
+
+      ipcRenderer.on("invoices-data", (_, invoices) => {
+        state.currentInvoices = invoices;
+        const list = document.querySelector(".invoices-list");
+        if (!list) return;
+        list.innerHTML = invoices.length ? "" : "<p>No invoices yet.</p>";
+        invoices.forEach(inv => {
+          const div = document.createElement("div");
+          div.className = "lead-card";
+          div.innerHTML = `
+            <div class="lead-header">
+              <h4 class="bold">${inv.invoice_number} <span class="detail-text">(${inv.client_name})</span></h4>
+              <span class="status-badge status-${inv.status.toLowerCase()}">${inv.status}</span>
+            </div>
+            <p class="detail-text">Date: ${inv.date} | Due: ${inv.due_date || "N/A"}</p>
+            <p class="bold">Total: LKR ${inv.total_amount.toFixed(2)}</p>
+            <div class="actions">
+              <button class="secondary-btn small" onclick="openInvoiceModal(${inv.id})">View / Print</button>
+              <button class="secondary-btn small text-red" onclick="deleteInvoice(${inv.id})">Delete</button>
+            </div>`;
+          list.appendChild(div);
+        });
+      });
+
+      window.deleteInvoice = (id) => {
+        if (confirm("Are you sure you want to delete this invoice?")) {
+          ipcRenderer.send("delete-invoice", id);
+        }
+      };
+
+      window.openInvoiceModal = (id) => {
+        const inv = state.currentInvoices.find(i => i.id === id);
+        if (!inv) return;
+        document.getElementById("view-inv-number").textContent = inv.invoice_number;
+        document.getElementById("view-inv-client").textContent = inv.client_name;
+        document.getElementById("view-inv-date").textContent = inv.date;
+        document.getElementById("view-inv-due").textContent = inv.due_date;
+        document.getElementById("view-inv-status").textContent = inv.status;
+        document.getElementById("view-inv-total").textContent = "LKR " + inv.total_amount.toFixed(2);
+        const btn = document.getElementById("mark-paid-btn");
+        btn.style.display = inv.status === "Paid" ? "none" : "inline-block";
+        btn.onclick = () => { if (confirm("Mark as Paid?")) ipcRenderer.send("mark-invoice-paid", inv.id); };
+        ipcRenderer.send("get-invoice-details", id);
+        invViewModal.classList.add("active");
+      };
+
+      ipcRenderer.on("invoice-details-data", (_, data) => {
+        const tbody = document.getElementById("view-inv-items");
+        tbody.innerHTML = data.items.map(item => `
+          <tr>
+            <td>${item.description}</td>
+            <td>${item.quantity}</td>
+            <td>LKR ${item.unit_price.toFixed(2)}</td>
+            <td>LKR ${item.amount.toFixed(2)}</td>
+          </tr>`).join("");
+      });
+
+      ipcRenderer.on("financial-reports-data", (_, data) => {
+        if (data.error) return;
+        document.getElementById("report-income").textContent = `LKR ${data.incomeStatement.income.toFixed(2)}`;
+        document.getElementById("report-expense").textContent = `LKR ${data.incomeStatement.expenses.toFixed(2)}`;
+        const profit = document.getElementById("report-profit");
+        profit.textContent = `LKR ${data.incomeStatement.netProfit.toFixed(2)}`;
+        profit.className = `row-value bold ${data.incomeStatement.netProfit >= 0 ? "text-green" : "text-red"}`;
+        document.getElementById("report-assets").textContent = `LKR ${data.balanceSheet.assets.toFixed(2)}`;
+        document.getElementById("report-liabilities").textContent = `LKR ${data.balanceSheet.liabilities.toFixed(2)}`;
+        document.getElementById("report-equity").textContent = `LKR ${data.balanceSheet.equity.toFixed(2)}`;
+      });
+
+      ipcRenderer.on("tax-report-data", (_, rows) => {
+        const list = document.getElementById("tax-report-list");
+        if (!list) return;
+        list.innerHTML = rows?.length ? rows.map(r => `
+          <tr><td>${r.tax_category}</td><td style="text-align: right;" class="text-red">LKR ${r.total.toFixed(2)}</td></tr>
+        `).join("") : "<tr><td colspan='2' class='muted center'>No expense data.</td></tr>";
+      });
+
+      ipcRenderer.on("products-data", (_, products) => {
+        const tbody = document.getElementById("inventory-table-body");
+        if (!tbody) return;
+        tbody.innerHTML = products.length ? products.map(p => `
+          <tr>
+            <td class="bold">${p.name}</td>
+            <td class="detail-text">${p.type}</td>
+            <td>LKR ${p.price.toFixed(2)}</td>
+            <td class="detail-text">${p.description || ""}</td>
+            <td><button class="text-red" onclick="deleteProduct(${p.id})">&times;</button></td>
+          </tr>`).join("") : "<tr><td colspan='5' class='muted center'>No items.</td></tr>";
+      });
+
+      window.deleteProduct = (id) => {
+        if (confirm("Delete this product/service?")) ipcRenderer.send("delete-product", id);
+      };
+
+      ipcRenderer.on("documents-data", (_, docs) => {
+        const list = document.querySelector(".docs-list");
+        if (!list) return;
+        list.innerHTML = docs.length ? "" : "<p>No documents yet.</p>";
+        docs.forEach(d => {
+          const card = document.createElement("div");
+          card.className = "lead-card";
+          card.innerHTML = `
+            <h4 class="bold">${d.name} <span class="detail-text">(${d.type})</span></h4>
+            <p class="detail-text">${d.expiry_date ? 'Expires: ' + new Date(d.expiry_date).toLocaleDateString() : 'No Expiry'}</p>
+            <p class="detail-text muted">${d.notes || ""}</p>`;
+          list.appendChild(card);
+        });
+      });
+
+      ipcRenderer.on("compliance-alerts-data", (_, alerts) => {
+        const box = document.getElementById("compliance-alerts");
+        const msg = document.getElementById("compliance-msg");
+        if (alerts?.length > 0) {
+          box.style.display = "block";
+          msg.textContent = `${alerts.length} item(s) expiring soon. Next: ${alerts[0].name} on ${new Date(alerts[0].expiry_date).toLocaleDateString()}`;
+        } else {
+          box.style.display = "none";
+        }
+      });
+
+      ipcRenderer.on("backup-complete", (_, res) => alert(res.error ? "Backup Failed: " + res.error : "Backup Saved to: " + res.path));
+      ipcRenderer.on("restore-complete", (_, res) => {
+        if (res.error) alert("Restore Failed: " + res.error);
+        else { alert("Restore Successful. Reloading..."); location.reload(); }
+      });
+
+      ipcRenderer.on("client-deleted", () => {
+        closeAllModals();
+        showPage("clients", "Clients");
+        ipcRenderer.send("get-clients", 1);
+      });
+
+      ipcRenderer.on("client-document-saved", () => {
+        closeAllModals();
+        if (state.selectedDocClient) ipcRenderer.send("get-client-documents", state.selectedDocClient.id);
+      });
+
+      ipcRenderer.on("client-document-deleted", () => {
+        if (state.selectedDocClient) ipcRenderer.send("get-client-documents", state.selectedDocClient.id);
+      });
+
+      // Initial Load
+      ipcRenderer.send("get-business-info", 1);
+      ipcRenderer.send("get-dashboard-stats", 1);
+      ipcRenderer.send("get-compliance-alerts", 1);
+
+      // Set current month/year filters
+      const now = new Date();
+      document.getElementById("acc-month-filter").value = now.getMonth() + 1;
+      document.getElementById("acc-year-filter").value = now.getFullYear();
+
+      showPage("dashboard", "Dashboard");
+    });
+  </script>
+</body>
+
+</html>
