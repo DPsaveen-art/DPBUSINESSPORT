@@ -254,6 +254,87 @@ db.run(`
      )
    `);
 
+/* ---------- Tasks Management ---------- */
+db.run(`
+    CREATE TABLE IF NOT EXISTS tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      business_id INTEGER NOT NULL,
+      client_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      status TEXT DEFAULT 'Pending',
+      due_date TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (business_id) REFERENCES businesses(id),
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+    )
+  `);
+
+/* ---------- Content Ops OS ---------- */
+db.run(`
+    CREATE TABLE IF NOT EXISTS content_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER NOT NULL,
+      platform TEXT NOT NULL,
+      title TEXT NOT NULL,
+      caption TEXT,
+      hashtags TEXT,
+      status TEXT DEFAULT 'IDEA',
+      scheduled_date TEXT,
+      posted_date TEXT,
+      cta_hook TEXT,
+      media_path TEXT,
+      notes TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+    )
+  `);
+
+// Migration for content_items (adding new columns if they don't exist)
+db.serialize(() => {
+  db.all("PRAGMA table_info(content_items)", (err, columns) => {
+    if (err) return;
+    const hasCta = columns.some(c => c.name === 'cta_hook');
+    const hasMedia = columns.some(c => c.name === 'media_path');
+    if (!hasCta) db.run("ALTER TABLE content_items ADD COLUMN cta_hook TEXT");
+    if (!hasMedia) db.run("ALTER TABLE content_items ADD COLUMN media_path TEXT");
+  });
+});
+
+db.run(`
+    CREATE TABLE IF NOT EXISTS content_activities (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content_id INTEGER NOT NULL,
+      action TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (content_id) REFERENCES content_items(id) ON DELETE CASCADE
+    )
+  `);
+
+db.run(`
+    CREATE TABLE IF NOT EXISTS caption_library (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER,
+      platform TEXT,
+      caption TEXT NOT NULL,
+      tags TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+    )
+  `);
+
+db.run(`
+    CREATE TABLE IF NOT EXISTS hashtag_sets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER,
+      platform TEXT,
+      hashtags TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+    )
+  `);
+
 /* ---------- Settings ---------- */
 db.run(`
     CREATE TABLE IF NOT EXISTS settings (

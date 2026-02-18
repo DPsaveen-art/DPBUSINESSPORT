@@ -21,6 +21,7 @@
         <a href="#" data-page="accounting">Accounting</a>
         <a href="#" data-page="tasks">Tasks</a>
         <a href="#" data-page="documents">Documents</a>
+        <a href="#" data-page="content-dashboard">Content</a>
         <a href="#" data-page="settings">Settings</a>
       </nav>
     </aside>
@@ -191,6 +192,7 @@
           <button class="tab-btn" data-tab="accounts-tab">Chart of Accounts</button>
           <button class="tab-btn" data-tab="invoices-tab">Invoices</button>
           <button class="tab-btn" data-tab="inventory-tab">Inventory</button>
+          <button class="tab-btn" data-tab="profit-tab">Profit Distribution</button>
           <button class="tab-btn" data-tab="reports-tab">Reports</button>
           <button class="tab-btn" data-tab="settings-tab">Settings</button>
         </div>
@@ -202,6 +204,10 @@
         </div>
 
         <div id="accounts-tab" class="tab-content">
+          <div class="page-header">
+            <h3>Chart of Accounts</h3>
+            <button class="primary-btn" id="add-account-btn">+ Add Account</button>
+          </div>
           <div class="accounts-list">
             <p>Loading accounts...</p>
           </div>
@@ -230,14 +236,30 @@
                   <th class="col-type">Type</th>
                   <th class="col-price">Price</th>
                   <th class="col-desc">Description</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="inventory-table-body">
                 <tr>
-                  <td colspan="4" class="muted center">No items found.</td>
+                  <td colspan="5" class="muted center">No items found.</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <div id="profit-tab" class="tab-content">
+          <div class="report-card" style="max-width: 600px;">
+            <h3>Monthly Profit Distribution</h3>
+            <p class="detail-text" style="margin-bottom: 20px;">
+              Distribute the monthly net profit (Income - Expenses) among partners and equity.
+            </p>
+            <div id="profit-calc-area" class="muted center" style="padding: 20px;">
+              Select a month/year filter to see distribution.
+            </div>
+            <div id="profit-actions" style="display:none; margin-top:20px;">
+              <button class="primary-btn" id="process-dist-btn">Process Distribution</button>
+            </div>
           </div>
         </div>
 
@@ -337,7 +359,22 @@
         </div>
       </section>
       <section class="page" id="tasks">
-        <p>Tasks page</p>
+        <div class="page-header">
+          <h2>Client Tasks</h2>
+          <div>
+            <button class="primary-btn" id="add-task-btn" style="display:none">+ Add Task</button>
+          </div>
+        </div>
+        <div class="docs-container">
+          <div class="client-selector" id="task-client-list">
+            <p class="muted center" style="padding: 20px;">Loading clients...</p>
+          </div>
+          <div class="doc-manager-main" id="task-manager-content">
+            <div class="no-selection">
+              <p>Select a client to manage their tasks</p>
+            </div>
+          </div>
+        </div>
       </section>
       <section class="page" id="documents">
         <div class="page-header">
@@ -358,6 +395,151 @@
           </div>
         </div>
       </section>
+      <section class="page" id="content-dashboard">
+        <div class="page-header">
+          <h2>Content Dashboard</h2>
+          <div class="flex-gap">
+            <select id="content-dashboard-month" class="status-select" onchange="loadContentData()">
+              <option value="all">All Months</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select id="content-dashboard-year" class="status-select" onchange="loadContentData()">
+              <option value="all">All Years</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+            </select>
+            <button class="primary-btn" onclick="showPage('content-pipeline')">View Pipeline</button>
+            <button class="secondary-btn" id="add-content-dashboard-btn" style="display:none">+ New Content</button>
+          </div>
+        </div>
+        <div class="docs-container">
+          <div class="client-selector content-client-list">
+            <p class="muted center" style="padding: 20px;">Loading clients...</p>
+          </div>
+          <div class="doc-manager-main">
+            <div id="content-overview-stats" class="stats-container">
+              <!-- Dashboard stats for content -->
+            </div>
+            <div class="card" style="margin-top: 20px;">
+              <div class="flex-row" style="justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Content Planner</h3>
+                <span class="muted detail-text">All content for selected period</span>
+              </div>
+              <div id="content-table-container">
+                <p class="muted center">Select a client to see content</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="content-pipeline">
+        <div class="page-header">
+          <h2>Content Pipeline</h2>
+          <div class="flex-gap">
+            <select id="content-pipeline-month" class="status-select" onchange="loadContentData()">
+              <option value="all">All Months</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select id="content-pipeline-year" class="status-select" onchange="loadContentData()">
+              <option value="all">All Years</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+            </select>
+            <select id="content-platform-filter" class="status-select" onchange="refreshPipeline()">
+              <option value="all">All Platforms</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="TikTok">TikTok</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="X">X</option>
+            </select>
+            <button class="primary-btn" id="add-content-pipeline-btn" style="display:none">+ Add Idea</button>
+          </div>
+        </div>
+        <div class="docs-container">
+          <div class="client-selector content-client-list">
+            <p class="muted center" style="padding: 20px;">Loading clients...</p>
+          </div>
+          <div class="doc-manager-main">
+            <div class="pipeline-board" id="pipeline-board">
+              <div class="no-selection">
+                <p>Select a client to view pipeline</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="content-calendar">
+        <div class="page-header">
+          <h2>Content Calendar</h2>
+        </div>
+        <div class="docs-container">
+          <div class="client-selector content-client-list">
+            <p class="muted center" style="padding: 20px;">Loading clients...</p>
+          </div>
+          <div class="doc-manager-main" id="calendar-view">
+            <div class="card">
+              <p class="muted center">Date-based view coming soon...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="content-library">
+        <div class="page-header">
+          <h2>Content Library</h2>
+          <div class="flex-gap">
+            <button class="secondary-btn" id="add-caption-btn" style="display:none">+ Save Caption</button>
+            <button class="secondary-btn" id="add-hashtag-btn" style="display:none">+ Save Hashtags</button>
+          </div>
+        </div>
+        <div class="docs-container">
+          <div class="client-selector" style="flex: 0 0 150px;">
+            <div class="client-doc-item active" onclick="showLibraryTab('captions')">
+              <h4>Captions</h4>
+            </div>
+            <div class="client-doc-item" onclick="showLibraryTab('hashtags')">
+              <h4>Hashtag Sets</h4>
+            </div>
+          </div>
+          <div class="client-selector content-client-list"
+            style="flex: 0 0 200px; border-left: 1px solid var(--color-border);">
+            <p class="muted center">Loading clients...</p>
+          </div>
+          <div class="doc-manager-main" id="library-content">
+            <div class="no-selection">
+              <p>Select a client to view assets</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="page" id="settings">
         <div class="page-header">
           <h2>General Settings</h2>
@@ -696,6 +878,40 @@
     </div>
   </div>
 
+  <!-- ACCOUNT MODAL -->
+  <div id="add-account-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Account</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Account Name*</label>
+          <input type="text" id="acc-name" placeholder="e.g. Saveen Drawings, Bank Loan">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="acc-type">
+            <option value="Asset">Asset</option>
+            <option value="Liability">Liability</option>
+            <option value="Equity">Equity</option>
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tax Category (For Expenses)</label>
+          <input type="text" id="acc-tax" placeholder="e.g. Travel, Advertisement">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-account-btn">Save Account</button>
+      </div>
+    </div>
+  </div>
+
   <!-- CLIENT DOCUMENT MODAL -->
   <div id="add-client-doc-modal" class="modal">
     <div class="modal-content">
@@ -729,6 +945,177 @@
     </div>
   </div>
 
+  <!-- TASK MODAL -->
+  <div id="task-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="task-modal-title">Add Task</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="task-id">
+        <div class="form-group">
+          <label>Title*</label>
+          <input type="text" id="task-title" placeholder="e.g. Meta Ads Review">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="task-due-date">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="task-desc" placeholder="Details about the task..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-task-btn">Save Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT MODAL -->
+  <div id="content-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="content-modal-title">New Content</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="content-id">
+        <div class="form-group">
+          <label>Platform*</label>
+          <select id="content-platform">
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="TikTok">TikTok</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="X">X</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Internal Title*</label>
+          <input type="text" id="content-title" placeholder="e.g. Monday Morning Motivation">
+        </div>
+        <div class="form-group">
+          <label>CTA / Hook</label>
+          <textarea id="content-cta-hook" rows="2" placeholder="e.g. Click the link in bio to learn more!"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Caption</label>
+          <textarea id="content-caption" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Hashtags</label>
+          <textarea id="content-hashtags" rows="2"></textarea>
+        </div>
+        <div class="flex-row gap-10">
+          <div class="form-group flex-1">
+            <label>Scheduled Date</label>
+            <input type="date" id="content-scheduled-date">
+          </div>
+          <div class="form-group flex-1">
+            <label>Initial Status</label>
+            <select id="content-status">
+              <option value="IDEA">IDEA</option>
+              <option value="DRAFT">DRAFT</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="SCHEDULED">SCHEDULED</option>
+              <option value="POSTED">POSTED</option>
+              <option value="REVIEWED">REVIEWED</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Media Attachment</label>
+          <div class="flex-gap" style="align-items: center;">
+            <button class="secondary-btn small" id="select-media-btn">Select Image/Video</button>
+            <span id="content-media-path" class="detail-text muted truncate" style="max-width: 250px;">No file
+              selected</span>
+            <button class="text-red small" id="remove-media-btn">Remove</button>
+          </div>
+          <div id="content-media-preview" style="margin-top: 10px; max-height: 150px; display: none;">
+            <!-- Preview image or video icon -->
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="content-notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-content-btn">Save Content</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPTION LIBRARY MODAL -->
+  <div id="caption-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Save to Caption Library</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Platform</label>
+          <select id="lib-caption-platform">
+            <option value="all">All Platforms</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="TikTok">TikTok</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="X">X</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Caption Text*</label>
+          <textarea id="lib-caption-text" rows="6"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tags</label>
+          <input type="text" id="lib-caption-tags" placeholder="e.g. motivation, sales, morning">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-lib-caption-btn">Save to Library</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HASHTAG LIBRARY MODAL -->
+  <div id="hashtag-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Save Hashtag Set</h3>
+        <span class="modal-close-icon" onclick="this.closest('.modal').classList.remove('active')">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Platform</label>
+          <select id="lib-hashtag-platform">
+            <option value="all">All Platforms</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="TikTok">TikTok</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="X">X</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Hashtags*</label>
+          <textarea id="lib-hashtag-text" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="this.closest('.modal').classList.remove('active')">Cancel</button>
+        <button class="primary-btn" id="save-lib-hashtag-btn">Save Hashtags</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const { ipcRenderer } = require("electron");
@@ -738,8 +1125,11 @@
         selectedClient: null,
         selectedLead: null,
         selectedDocClient: null,
+        selectedTaskClient: null,
+        selectedContentClient: null,
         currentInvoices: [],
-        isEditMode: false
+        isEditMode: false,
+        activeLibraryTab: 'captions'
       };
 
       // UI Elements - Navigation
@@ -759,6 +1149,7 @@
       const invViewModal = document.getElementById("view-invoice-modal");
       const prodModal = document.getElementById("product-modal");
       const clientDocModal = document.getElementById("add-client-doc-modal");
+      const taskModal = document.getElementById("task-modal");
 
       /* ===================== MODAL HELPERS ===================== */
 
@@ -786,7 +1177,8 @@
       const refreshEvents = [
         "client-saved", "client-updated", "client-deleted", "lead-saved", "lead-updated",
         "transaction-saved", "transaction-deleted", "invoice-saved", "invoice-paid-success", "invoice-deleted",
-        "product-saved", "product-deleted", "document-saved", "client-document-saved", "client-document-deleted", "settings-saved"
+        "product-saved", "product-deleted", "document-saved", "client-document-saved", "client-document-deleted",
+        "task-saved", "task-deleted", "settings-saved", "content-saved", "content-deleted"
       ];
       refreshEvents.forEach(ev => ipcRenderer.on(ev, () => {
         closeAllModals();
@@ -809,6 +1201,8 @@
         if (id === "leads") ipcRenderer.send("get-leads", 1);
         if (id === "corporate") ipcRenderer.send("get-documents", 1);
         if (id === "documents") ipcRenderer.send("get-clients", 1);
+        if (id === "tasks") ipcRenderer.send("get-clients", 1);
+        if (id.startsWith("content")) ipcRenderer.send("get-clients", 1);
         if (id === "accounting") {
           refreshAccountingData();
         }
@@ -838,6 +1232,22 @@
           showPage(link.dataset.page, link.textContent);
         };
       });
+
+      // Content Ops Button Handlers
+      document.getElementById("add-content-dashboard-btn").onclick = () => openContentModal();
+      document.getElementById("add-content-pipeline-btn").onclick = () => openContentModal();
+      document.getElementById("add-caption-btn").onclick = () => openCaptionModal();
+      document.getElementById("add-hashtag-btn").onclick = () => openHashtagModal();
+
+      document.getElementById("select-media-btn").onclick = () => {
+        ipcRenderer.send('select-content-media');
+      };
+      document.getElementById("remove-media-btn").onclick = () => {
+        const pathEl = document.getElementById('content-media-path');
+        pathEl.textContent = 'No file selected';
+        pathEl.dataset.path = '';
+        document.getElementById('content-media-preview').style.display = 'none';
+      };
 
       tabBtns.forEach(btn => {
         btn.onclick = () => {
@@ -1080,7 +1490,42 @@
         });
       };
 
+      window.editProduct = (id) => {
+        ipcRenderer.send("get-product-by-id", id);
+      };
+
+      ipcRenderer.on("product-data", (_, p) => {
+        if (!p) return;
+        document.getElementById("prod-id").value = p.id;
+        document.getElementById("prod-name").value = p.name;
+        document.getElementById("prod-type").value = p.type;
+        document.getElementById("prod-price").value = p.price;
+        document.getElementById("prod-desc").value = p.description || "";
+        prodModal.classList.add("active");
+      });
+
       /* ===================== CORPORATE & SETTINGS ===================== */
+
+      document.getElementById("add-account-btn").onclick = () => {
+        resetForm("add-account-modal");
+        document.getElementById("add-account-modal").classList.add("active");
+      };
+
+      document.getElementById("save-account-btn").onclick = () => {
+        const name = document.getElementById("acc-name").value.trim();
+        if (!name) return alert("Account name required");
+        ipcRenderer.send("save-account", {
+          business_id: 1,
+          name,
+          type: document.getElementById("acc-type").value,
+          tax_category: document.getElementById("acc-tax").value.trim()
+        });
+      };
+
+      ipcRenderer.on("account-saved", () => {
+        closeAllModals();
+        ipcRenderer.send("get-accounts", 1);
+      });
 
       document.getElementById("add-doc-btn").onclick = () => {
         resetForm("add-doc-modal");
@@ -1202,11 +1647,48 @@
              </div>
            `).join("");
         }
+        // Task Page Client List
+        const taskClientList = document.getElementById("task-client-list");
+        if (taskClientList) {
+          taskClientList.innerHTML = clients.map(c => `
+             <div class="client-doc-item ${state.selectedTaskClient?.id === c.id ? 'active' : ''}" onclick="selectTaskClient(${c.id})">
+               <h4 class="bold">${c.name}</h4>
+             </div>
+           `).join("");
+        }
+        // Content Page Client Lists
+        const contentClientLists = document.querySelectorAll(".content-client-list");
+        contentClientLists.forEach(list => {
+          list.innerHTML = clients.map(c => `
+             <div class="client-doc-item ${state.selectedContentClient?.id === c.id ? 'active' : ''}" onclick="selectContentClient(${c.id})">
+               <h4 class="bold">${c.name}</h4>
+             </div>
+           `).join("");
+        });
       });
 
       window.selectDocClient = (id) => {
         ipcRenderer.send("get-client-by-id-for-docs", id);
       };
+
+      window.selectContentClient = (id) => {
+        ipcRenderer.send("get-client-by-id-for-content", id);
+      };
+
+      ipcRenderer.on("client-data-for-content", (_, c) => {
+        state.selectedContentClient = c;
+        // Update selection UI
+        ipcRenderer.send("get-clients", 1);
+
+        // Show buttons
+        document.getElementById("add-content-dashboard-btn").style.display = "inline-block";
+        document.getElementById("add-content-pipeline-btn").style.display = "inline-block";
+        document.getElementById("add-caption-btn").style.display = "inline-block";
+        document.getElementById("add-hashtag-btn").style.display = "inline-block";
+
+        loadContentData();
+        if (state.activeLibraryTab) loadLibraryData();
+      });
 
       ipcRenderer.on("client-data-for-docs", (_, c) => {
         state.selectedDocClient = c;
@@ -1420,11 +1902,59 @@
         document.getElementById("report-income").textContent = `LKR ${data.incomeStatement.income.toFixed(2)}`;
         document.getElementById("report-expense").textContent = `LKR ${data.incomeStatement.expenses.toFixed(2)}`;
         const profit = document.getElementById("report-profit");
-        profit.textContent = `LKR ${data.incomeStatement.netProfit.toFixed(2)}`;
-        profit.className = `row-value bold ${data.incomeStatement.netProfit >= 0 ? "text-green" : "text-red"}`;
+        const netProfit = data.incomeStatement.netProfit;
+        profit.textContent = `LKR ${netProfit.toFixed(2)}`;
+        profit.className = `row-value bold ${netProfit >= 0 ? "text-green" : "text-red"}`;
         document.getElementById("report-assets").textContent = `LKR ${data.balanceSheet.assets.toFixed(2)}`;
         document.getElementById("report-liabilities").textContent = `LKR ${data.balanceSheet.liabilities.toFixed(2)}`;
         document.getElementById("report-equity").textContent = `LKR ${data.balanceSheet.equity.toFixed(2)}`;
+
+        // Update Profit Distribution Tab
+        const calcArea = document.getElementById("profit-calc-area");
+        if (netProfit <= 0) {
+          calcArea.innerHTML = `<p class='muted'>Monthly profit is 0 or negative. No distribution possible.</p>`;
+          document.getElementById("profit-actions").style.display = "none";
+        } else {
+          const s40 = netProfit * 0.4;
+          const k40 = netProfit * 0.4;
+          const e20 = netProfit * 0.2;
+          calcArea.innerHTML = `
+            <table class='report-table' style='width:100%'>
+              <tr><td class='row-label'>Total Monthly Profit</td><td class='row-value bold'>LKR ${netProfit.toFixed(2)}</td></tr>
+              <tr style='height:15px'></tr>
+              <tr><td class='row-label'>Saveen (40%)</td><td class='row-value'>LKR ${s40.toFixed(2)}</td></tr>
+              <tr><td class='row-label'>Kumudesh (40%)</td><td class='row-value'>LKR ${k40.toFixed(2)}</td></tr>
+              <tr><td class='row-label'>Reinvestment/Equity (20%)</td><td class='row-value'>LKR ${e20.toFixed(2)}</td></tr>
+            </table>
+          `;
+          document.getElementById("profit-actions").style.display = "block";
+          state.currentDistribution = { netProfit, s40, k40, e20 };
+        }
+      });
+
+      document.getElementById("process-dist-btn").onclick = () => {
+        const d = state.currentDistribution;
+        if (!d) return;
+        if (confirm("This will record 3 transactions for profit distribution. Continue?")) {
+          // Send to backend to process
+          // We'll use multiple save-transaction calls or a dedicated handler
+          ipcRenderer.send("process-distribution", {
+            business_id: 1,
+            month: document.getElementById("acc-month-filter").value,
+            year: document.getElementById("acc-year-filter").value,
+            ...d
+          });
+        }
+      };
+
+      ipcRenderer.on("distribution-processed", () => {
+        alert("Profit distribution processed successfully!");
+        ipcRenderer.send("get-dashboard-stats", 1);
+        ipcRenderer.send("get-financial-reports", {
+          businessId: 1,
+          month: parseInt(document.getElementById("acc-month-filter").value),
+          year: parseInt(document.getElementById("acc-year-filter").value)
+        });
       });
 
       ipcRenderer.on("tax-report-data", (_, rows) => {
@@ -1444,7 +1974,10 @@
             <td class="detail-text">${p.type}</td>
             <td>LKR ${p.price.toFixed(2)}</td>
             <td class="detail-text">${p.description || ""}</td>
-            <td><button class="text-red" onclick="deleteProduct(${p.id})">&times;</button></td>
+            <td>
+              <button class="secondary-btn small" onclick="editProduct(${p.id})">Edit</button>
+              <button class="text-red" onclick="deleteProduct(${p.id})">&times;</button>
+            </td>
           </tr>`).join("") : "<tr><td colspan='5' class='muted center'>No items.</td></tr>";
       });
 
@@ -1499,6 +2032,419 @@
         if (state.selectedDocClient) ipcRenderer.send("get-client-documents", state.selectedDocClient.id);
       });
 
+      /* ===================== TASKS ===================== */
+      window.selectTaskClient = (id) => {
+        ipcRenderer.send("get-client-by-id-for-tasks", id);
+      };
+
+      ipcRenderer.on("client-data-for-tasks", (_, c) => {
+        state.selectedTaskClient = c;
+        document.querySelectorAll("#task-client-list .client-doc-item").forEach(i => i.classList.remove("active"));
+        // Highlight active
+        ipcRenderer.send("get-clients", 1); // Refresh list to show active (simplified)
+
+        document.getElementById("add-task-btn").style.display = "inline-block";
+        const content = document.getElementById("task-manager-content");
+        content.innerHTML = `<h3>Tasks for ${c.name}</h3><div id="client-tasks-list" class="muted">Loading tasks...</div>`;
+        ipcRenderer.send("get-client-tasks", c.id);
+      });
+
+      ipcRenderer.on("client-tasks-data", (_, tasks) => {
+        const list = document.getElementById("client-tasks-list");
+        if (!list) return;
+        list.className = "";
+        if (!tasks.length) {
+          list.innerHTML = "<p class='muted'>No tasks for this client yet.</p>";
+          return;
+        }
+        list.innerHTML = `
+           <table class="data-table">
+             <thead><tr><th>Status</th><th>Title</th><th>Due Date</th><th>Actions</th></tr></thead>
+             <tbody>
+               ${tasks.map(t => `
+                 <tr class="${t.status === 'Completed' ? 'muted' : ''}">
+                   <td>
+                     <select onchange="updateTaskStatus(${t.id}, this.value)" class="status-select ${t.status.toLowerCase()}">
+                       <option value="Pending" ${t.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                       <option value="In Progress" ${t.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                       <option value="Completed" ${t.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                     </select>
+                   </td>
+                   <td class="bold">${t.title}</td>
+                   <td class="detail-text">${t.due_date ? new Date(t.due_date).toLocaleDateString() : '—'}</td>
+                   <td>
+                     <button class="secondary-btn small" onclick="editTask(${JSON.stringify(t).replace(/"/g, '&quot;')})">Edit</button>
+                     <button class="text-red" onclick="deleteTask(${t.id})">&times;</button>
+                   </td>
+                 </tr>
+               `).join("")}
+             </tbody>
+           </table>
+         `;
+      });
+
+      document.getElementById("add-task-btn").onclick = () => {
+        if (!state.selectedTaskClient) return;
+        state.isEditMode = false;
+        resetForm("task-modal");
+        document.getElementById("task-modal-title").textContent = "Add Task";
+        taskModal.classList.add("active");
+      };
+
+      window.editTask = (t) => {
+        state.isEditMode = true;
+        document.getElementById("task-modal-title").textContent = "Edit Task";
+        document.getElementById("task-id").value = t.id;
+        document.getElementById("task-title").value = t.title;
+        document.getElementById("task-due-date").value = t.due_date || "";
+        document.getElementById("task-desc").value = t.description || "";
+        taskModal.classList.add("active");
+      };
+
+      document.getElementById("save-task-btn").onclick = () => {
+        const title = document.getElementById("task-title").value.trim();
+        if (!title) return alert("Title required");
+        ipcRenderer.send("save-task", {
+          id: document.getElementById("task-id").value,
+          business_id: 1,
+          client_id: state.selectedTaskClient.id,
+          title,
+          due_date: document.getElementById("task-due-date").value,
+          description: document.getElementById("task-desc").value.trim(),
+          status: state.isEditMode ? undefined : 'Pending'
+        });
+      };
+
+      window.updateTaskStatus = (id, status) => {
+        ipcRenderer.send("update-task-status", { id, status });
+      };
+
+      window.deleteTask = (id) => {
+        if (confirm("Delete this task?")) ipcRenderer.send("delete-task", id);
+      };
+
+      ipcRenderer.on("task-saved", () => {
+        closeAllModals();
+        if (state.selectedTaskClient) ipcRenderer.send("get-client-tasks", state.selectedTaskClient.id);
+      });
+
+      ipcRenderer.on("task-deleted", () => {
+        if (state.selectedTaskClient) ipcRenderer.send("get-client-tasks", state.selectedTaskClient.id);
+      });
+
+      /* ===================== CONTENT OPS OS ===================== */
+      const CONTENT_STATUSES = ['IDEA', 'DRAFT', 'APPROVED', 'SCHEDULED', 'POSTED', 'REVIEWED'];
+
+      function loadContentData() {
+        if (!state.selectedContentClient) return;
+
+        const activePage = document.querySelector(".page.active").id;
+        let month, year;
+
+        if (activePage === 'content-dashboard') {
+          month = document.getElementById("content-dashboard-month").value;
+          year = document.getElementById("content-dashboard-year").value;
+        } else if (activePage === 'content-pipeline') {
+          month = document.getElementById("content-pipeline-month").value;
+          year = document.getElementById("content-pipeline-year").value;
+        }
+
+        ipcRenderer.send("get-content-by-client", { clientId: state.selectedContentClient.id, month, year });
+      }
+
+      window.openContentModal = (item = null) => {
+        if (!state.selectedContentClient) return alert("Please select a client from the sidebar first.");
+        state.isEditMode = !!item;
+        resetForm("content-modal");
+        document.getElementById("content-modal-title").textContent = item ? "Edit Content" : "New Content Idea";
+
+        // Reset Media UI
+        document.getElementById("content-media-path").textContent = "No file selected";
+        document.getElementById("content-media-path").dataset.path = "";
+        document.getElementById("content-media-preview").style.display = "none";
+
+        if (item) {
+          document.getElementById("content-id").value = item.id;
+          document.getElementById("content-platform").value = item.platform;
+          document.getElementById("content-title").value = item.title;
+          document.getElementById("content-cta-hook").value = item.cta_hook || "";
+          document.getElementById("content-caption").value = item.caption || "";
+          document.getElementById("content-hashtags").value = item.hashtags || "";
+          document.getElementById("content-scheduled-date").value = item.scheduled_date || "";
+          document.getElementById("content-status").value = item.status || "IDEA";
+          document.getElementById("content-notes").value = item.notes || "";
+
+          if (item.media_path) {
+            document.getElementById("content-media-path").textContent = item.media_path.split(/[\\/]/).pop();
+            document.getElementById("content-media-path").dataset.path = item.media_path;
+            showMediaPreview(item.media_path);
+          }
+        }
+        document.getElementById("content-modal").classList.add("active");
+      };
+
+      ipcRenderer.on("media-selected", (_, path) => {
+        const pathEl = document.getElementById("content-media-path");
+        if (pathEl) {
+          pathEl.textContent = path.split(/[\\/]/).pop();
+          pathEl.dataset.path = path;
+          showMediaPreview(path);
+        }
+      });
+
+      function showMediaPreview(path) {
+        const preview = document.getElementById("content-media-preview");
+        if (!preview) return;
+        const ext = path.split('.').pop().toLowerCase();
+        const isImg = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+        const isVid = ['mp4', 'mov', 'avi'].includes(ext);
+
+        preview.style.display = "block";
+        if (isImg) {
+          preview.innerHTML = `<img src="file://${path}" style="max-width: 100%; max-height: 150px; border-radius: 4px;">`;
+        } else if (isVid) {
+          preview.innerHTML = `<div class="detail-text bold"><i class="icon-video"></i> Video Attached</div>`;
+        } else {
+          preview.innerHTML = `<div class="detail-text">File Attachment</div>`;
+        }
+      }
+
+      document.getElementById("save-content-btn").onclick = () => {
+        const title = document.getElementById("content-title").value.trim();
+        if (!title) return alert("Title required");
+
+        const item = {
+          id: document.getElementById("content-id").value,
+          client_id: state.selectedContentClient.id,
+          platform: document.getElementById("content-platform").value,
+          title,
+          cta_hook: document.getElementById("content-cta-hook").value,
+          caption: document.getElementById("content-caption").value,
+          hashtags: document.getElementById("content-hashtags").value,
+          status: document.getElementById("content-status").value,
+          scheduled_date: document.getElementById("content-scheduled-date").value,
+          media_path: document.getElementById("content-media-path").dataset.path || "",
+          notes: document.getElementById("content-notes").value
+        };
+        ipcRenderer.send("save-content", item);
+      };
+
+      ipcRenderer.on("content-saved", (_, res) => {
+        if (res && res.error) {
+          alert("Error: " + res.error);
+        } else {
+          closeAllModals();
+          loadContentData();
+        }
+      });
+
+      ipcRenderer.on("content-deleted", () => loadContentData());
+
+      ipcRenderer.on("content-items-data", (_, items) => {
+        renderContentDashboard(items);
+        renderContentPipeline(items);
+      });
+
+      function renderContentDashboard(items) {
+        const stats = document.getElementById("content-overview-stats");
+        if (!stats) return;
+
+        const counts = items.reduce((acc, item) => {
+          acc[item.status] = (acc[item.status] || 0) + 1;
+          return acc;
+        }, {});
+
+        stats.innerHTML = `
+          <div class="stat-card"><h3>Ideas</h3><p class="stat-value">${counts['IDEA'] || 0}</p></div>
+          <div class="stat-card"><h3>Drafts</h3><p class="stat-value">${counts['DRAFT'] || 0}</p></div>
+          <div class="stat-card"><h3>Scheduled</h3><p class="stat-value">${counts['SCHEDULED'] || 0}</p></div>
+          <div class="stat-card"><h3>Posted</h3><p class="stat-value">${counts['POSTED'] || 0}</p></div>
+        `;
+
+        const container = document.getElementById("content-table-container");
+        if (!items.length) {
+          container.innerHTML = "<p class='muted center'>No content found for this client/period.</p>";
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Platform</th>
+                <th>Content Details</th>
+                <th>CTA / Hook</th>
+                <th>Media</th>
+                <th>Schedule</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(i => {
+          const mediaExt = i.media_path ? i.media_path.split('.').pop().toLowerCase() : '';
+          const isImg = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(mediaExt);
+          const mediaHtml = i.media_path
+            ? (isImg
+              ? `<img src="file://${i.media_path}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="openContentModal(${JSON.stringify(i).replace(/"/g, '&quot;')})">`
+              : `<div class="muted small" style="cursor: pointer;" onclick="openContentModal(${JSON.stringify(i).replace(/"/g, '&quot;')})">🎥 Video</div>`)
+            : '<span class="muted">—</span>';
+
+          return `
+                  <tr>
+                    <td><span class="badge badge-${i.platform.toLowerCase()}">${i.platform}</span></td>
+                    <td>
+                      <div class="bold">${i.title}</div>
+                      <div class="detail-text truncate" style="max-width: 200px;" title="${i.caption || ''}">${i.caption || '<span class="muted">No caption</span>'}</div>
+                      <div class="muted small truncate" style="max-width: 200px;">${i.hashtags || ''}</div>
+                    </td>
+                    <td class="detail-text" title="${i.cta_hook || ''}">${i.cta_hook ? i.cta_hook.substring(0, 50) + (i.cta_hook.length > 50 ? '...' : '') : '<span class="muted">—</span>'}</td>
+                    <td>${mediaHtml}</td>
+                    <td class="detail-text">${i.scheduled_date || '<span class="muted">TBD</span>'}</td>
+                    <td><span class="status-badge status-${i.status.toLowerCase()}">${i.status}</span></td>
+                    <td>
+                      <button class="secondary-btn small" onclick="openContentModal(${JSON.stringify(i).replace(/"/g, '&quot;')})">Edit</button>
+                      <button class="text-red" onclick="deleteContentItem(${i.id})">&times;</button>
+                    </td>
+                  </tr>
+                `;
+        }).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      window.refreshPipeline = () => loadContentData();
+
+      function renderContentPipeline(items) {
+        const board = document.getElementById("pipeline-board");
+        const platformFilter = document.getElementById("content-platform-filter").value;
+        if (!board) return;
+
+        const filtered = platformFilter === 'all' ? items : items.filter(i => i.platform === platformFilter);
+
+        board.innerHTML = CONTENT_STATUSES.map(status => {
+          const statusItems = filtered.filter(i => i.status === status);
+          return `
+            <div class="pipeline-column">
+              <div class="pipeline-column-header">
+                <h3>${status}</h3>
+                <span class="pipeline-column-count">${statusItems.length}</span>
+              </div>
+              <div class="pipeline-items">
+                ${statusItems.map(item => `
+                  <div class="content-card" onclick="openContentModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                    <div class="flex-row" style="justify-content: space-between; align-items: start;">
+                      <span class="badge badge-${item.platform.toLowerCase()}">${item.platform}</span>
+                      ${item.media_path ? '<span class="status-badge status-posted" style="font-size: 10px;">📎 Media</span>' : ''}
+                    </div>
+                    <h4 class="bold" style="margin-top: 5px;">${item.title}</h4>
+                    <div class="content-card-meta">
+                      <span>${item.scheduled_date || 'No date'}</span>
+                      <button class="text-red small" onclick="event.stopPropagation(); deleteContentItem(${item.id})">&times;</button>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      window.deleteContentItem = (id) => {
+        if (confirm("Delete this content item?")) ipcRenderer.send("delete-content", id);
+      };
+
+      /* --- Library Logic --- */
+      window.showLibraryTab = (tab) => {
+        state.activeLibraryTab = tab;
+        document.querySelectorAll("#library-tabs .client-doc-item").forEach(el => el.classList.remove("active"));
+        event.currentTarget.classList.add("active");
+        loadLibraryData();
+      };
+
+      window.loadLibraryData = () => {
+        const clientId = state.selectedContentClient?.id;
+        if (state.activeLibraryTab === 'captions') {
+          ipcRenderer.send("get-captions", clientId);
+        } else {
+          ipcRenderer.send("get-hashtags", clientId);
+        }
+      };
+
+      window.openCaptionModal = () => {
+        resetForm("caption-modal");
+        document.getElementById("caption-modal").classList.add("active");
+      };
+
+      window.openHashtagModal = () => {
+        resetForm("hashtag-modal");
+        document.getElementById("hashtag-modal").classList.add("active");
+      };
+
+      document.getElementById("save-lib-caption-btn").onclick = () => {
+        const caption = document.getElementById("lib-caption-text").value.trim();
+        if (!caption) return alert("Caption required");
+        ipcRenderer.send("save-caption", {
+          client_id: state.selectedContentClient?.id,
+          platform: document.getElementById("lib-caption-platform").value,
+          caption,
+          tags: document.getElementById("lib-caption-tags").value
+        });
+      };
+
+      document.getElementById("save-lib-hashtag-btn").onclick = () => {
+        const hashtags = document.getElementById("lib-hashtag-text").value.trim();
+        if (!hashtags) return alert("Hashtags required");
+        ipcRenderer.send("save-hashtags", {
+          client_id: state.selectedContentClient?.id,
+          platform: document.getElementById("lib-hashtag-platform").value,
+          hashtags
+        });
+      };
+
+      ipcRenderer.on("library-updated", () => {
+        closeAllModals();
+        loadLibraryData();
+      });
+
+      ipcRenderer.on("captions-data", (_, rows) => {
+        const container = document.getElementById("library-content");
+        if (!rows.length) {
+          container.innerHTML = "<p class='muted'>No saved captions.</p>";
+          return;
+        }
+        container.innerHTML = rows.map(r => `
+          <div class="library-item">
+            <span class="badge badge-${r.platform === 'all' ? 'x' : r.platform.toLowerCase()}">${r.platform}</span>
+            <div class="caption-text">${r.caption}</div>
+            <div class="tags">${r.tags || ''}</div>
+          </div>
+        `).join("");
+      });
+
+      ipcRenderer.on("hashtags-data", (_, rows) => {
+        const container = document.getElementById("library-content");
+        if (!rows.length) {
+          container.innerHTML = "<p class='muted'>No saved hashtag sets.</p>";
+          return;
+        }
+        container.innerHTML = rows.map(r => `
+          <div class="library-item">
+            <span class="badge badge-${r.platform === 'all' ? 'x' : r.platform.toLowerCase()}">${r.platform}</span>
+            <div class="caption-text">${r.hashtags}</div>
+          </div>
+        `).join("");
+      });
+
+      // Add content triggers to global showPage
+      const originalShowPage = window.showPage;
+      window.showPage = (pageId, title) => {
+        if (originalShowPage) originalShowPage(pageId, title);
+        if (pageId.startsWith('content')) loadContentData();
+        if (pageId === 'content-library') loadLibraryData();
+      };
+
       // Initial Load
       ipcRenderer.send("get-business-info", 1);
       ipcRenderer.send("get-dashboard-stats", 1);
@@ -1506,12 +2452,21 @@
 
       // Set current month/year filters
       const now = new Date();
-      document.getElementById("acc-month-filter").value = now.getMonth() + 1;
-      document.getElementById("acc-year-filter").value = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
+
+      document.getElementById("acc-month-filter").value = currentMonth;
+      document.getElementById("acc-year-filter").value = currentYear;
+
+      document.getElementById("content-dashboard-month").value = "all";
+      document.getElementById("content-dashboard-year").value = "all";
+      document.getElementById("content-pipeline-month").value = "all";
+      document.getElementById("content-pipeline-year").value = "all";
 
       showPage("dashboard", "Dashboard");
     });
   </script>
 </body>
+
 
 </html>

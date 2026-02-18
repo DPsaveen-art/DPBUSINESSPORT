@@ -30,7 +30,7 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
@@ -60,7 +60,7 @@ body {
 
 .sidebar-header h2 {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   letter-spacing: 1px;
   line-height: 1.2;
@@ -188,7 +188,7 @@ header.topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .page-header h2 {
@@ -254,7 +254,7 @@ header.topbar {
 
 .stat-card .stat-value {
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--color-black);
 }
 
@@ -269,7 +269,7 @@ header.topbar {
 
 .agency-slogan h1 {
   font-size: 42px;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--color-black);
   margin: 0;
   line-height: 1.2;
@@ -284,6 +284,7 @@ header.topbar {
 
 .stat-card.large .stat-value {
   font-size: 48px;
+  font-weight: 600;
 }
 
 /* Documents Styling */
@@ -576,8 +577,9 @@ header.topbar {
 .data-table th,
 .data-table td {
   text-align: left;
-  padding: 10px;
+  padding: 15px 12px;
   border-bottom: 1px solid var(--color-border);
+  line-height: 1.8;
 }
 
 .data-table th {
@@ -632,9 +634,10 @@ h3 {
 }
 
 .report-table td {
-  padding: 8px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
   font-size: 13px;
+  line-height: 2;
 }
 
 .report-table .row-label {
@@ -652,6 +655,179 @@ h3 {
   font-weight: 700;
   font-size: 14px;
   padding-top: 12px;
+}
+
+/* Layout Utilities */
+.flex-gap {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.flex-row {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.gap-10 {
+  gap: 10px;
+}
+
+/* Content Pipeline Board */
+.pipeline-board {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  height: calc(100vh - 200px);
+}
+
+.pipeline-column {
+  flex: 0 0 300px;
+  background: var(--color-gray-100);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+}
+
+.pipeline-column-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.pipeline-column-header h3 {
+  margin: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pipeline-column-count {
+  background: var(--color-gray-200);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.pipeline-items {
+  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Content Cards */
+.content-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.1s;
+}
+
+.content-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content-card h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.content-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--color-gray-500);
+}
+
+/* Platform Badges */
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badge-instagram {
+  background: #fdf2f8;
+  color: #be185d;
+}
+
+.badge-tiktok {
+  background: #000;
+  color: #fff;
+}
+
+.badge-linkedin {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.badge-facebook {
+  background: #ebf5ff;
+  color: #0866ff;
+}
+
+.badge-x {
+  background: #f3f4f6;
+  color: #000;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status Transitions in detail view */
+.status-workflow {
+  display: flex;
+  gap: 5px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.status-workflow button {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* Library specific */
+.library-item {
+  border-bottom: 1px solid var(--color-border);
+  padding: 15px 0;
+}
+
+.library-item:last-child {
+  border-bottom: none;
+}
+
+.library-item .caption-text {
+  font-size: 13px;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+
+.library-item .tags {
+  font-size: 11px;
+  color: var(--color-gray-500);
 }
 
 /* Inventory table specific columns */

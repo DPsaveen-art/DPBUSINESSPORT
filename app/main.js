@@ -119,7 +119,37 @@ ipcMain.on("get-client-by-id-for-docs", (event, id) => {
   );
 });
 
-// Update client
+// Fetch single client for tasks
+// Fetch single client for content
+ipcMain.on("get-client-by-id-for-content", (event, id) => {
+  db.get(
+    `SELECT * FROM clients WHERE id = ?`,
+    [id],
+    (err, row) => {
+      if (err) {
+        console.error("❌ Failed to fetch client for content:", err.message);
+      } else {
+        event.reply("client-data-for-content", row);
+      }
+    }
+  );
+});
+
+// Fetch single client for tasks
+ipcMain.on("get-client-by-id-for-tasks", (event, id) => {
+  db.get(
+    `SELECT * FROM clients WHERE id = ?`,
+    [id],
+    (err, row) => {
+      if (err) {
+        console.error("❌ Failed to fetch client for tasks:", err.message);
+      } else {
+        event.reply("client-data-for-tasks", row);
+      }
+    }
+  );
+});
+
 ipcMain.on("update-client", (event, client) => {
   const { id, name, email, phone, notes } = client;
 
@@ -295,6 +325,19 @@ ipcMain.on("get-accounts", (event, businessId) => {
   );
 });
 
+// Save Account
+ipcMain.on("save-account", (event, account) => {
+  const { business_id, name, type, tax_category } = account;
+  db.run(
+    `INSERT INTO accounts (business_id, name, type, tax_category) VALUES (?, ?, ?, ?)`,
+    [business_id, name, type, tax_category],
+    (err) => {
+      if (err) console.error("❌ Failed to save account:", err.message);
+      else event.reply("account-saved");
+    }
+  );
+});
+
 // Save Transaction
 ipcMain.on("save-transaction", (event, txn) => {
   const { business_id, date, description, amount, type, account_id, client_id } = txn;
@@ -354,39 +397,99 @@ ipcMain.on("delete-transaction", (event, id) => {
 // Update Report monthly filter as well
 ipcMain.on("get-financial-reports", (event, data) => {
   const { businessId, month, year } = data;
-  let query = `
-        SELECT 
-            SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) as total_income,
-            SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) as total_expenses
-        FROM transactions
-        WHERE business_id = ?
-    `;
-  const params = [businessId];
+  const monthStr = String(month).padStart(2, '0');
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+  const nextMonthStr = String(nextMonth).padStart(2, '0');
 
-  if (month && year) {
-    const nextMonth = month === 12 ? 1 : month + 1;
-    const nextYear = month === 12 ? year + 1 : year;
-    query += ` AND date >= ? AND date < ?`;
-    params.push(`${year}-${String(month).padStart(2, '0')}-01`);
-    params.push(`${nextYear}-${String(nextMonth).padStart(2, '0')}-01`);
-  }
+  const start = `${year}-${monthStr}-01`;
+  const end = `${nextYear}-${nextMonthStr}-01`;
 
-  db.get(query, params, (err, row) => {
-    if (err) {
-      console.error("❌ Failed to generate reports:", err.message);
-      event.reply("financial-reports-data", { error: err.message });
-    } else {
-      const income = row?.total_income || 0;
-      const expenses = row?.total_expenses || 0;
-      const netProfit = income - expenses;
-      const assets = netProfit;
-      const equity = netProfit;
+  // Get Income Statement for the period
+  db.get(
+    `SELECT 
+      SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) as income,
+      SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) as expenses
+     FROM transactions 
+     WHERE business_id = ? AND date >= ? AND date < ?`,
+    [businessId, start, end],
+    (err, pnl) => {
+      if (err) return event.reply("financial-reports-data", { error: err.message });
 
-      event.reply("financial-reports-data", {
-        incomeStatement: { income, expenses, netProfit },
-        balanceSheet: { assets, liabilities: 0, equity }
-      });
+      // Get cumulative balances for Asset, Liability, Equity
+      // Note: This is simplified. Normally Asset balance = sum(Income) - sum(Expense) in that account.
+      // We'll sum all transactions linked to these account types up to end of period.
+      db.all(
+        `SELECT a.type, SUM(CASE WHEN t.type = 'Income' THEN t.amount ELSE -t.amount END) as balance
+         FROM transactions t
+         JOIN accounts a ON t.account_id = a.id
+         WHERE t.business_id = ? AND t.date < ?
+         AND a.type IN ('Asset', 'Liability', 'Equity')
+         GROUP BY a.type`,
+        [businessId, end],
+        (err, balances) => {
+          if (err) return event.reply("financial-reports-data", { error: err.message });
+
+          const report = {
+            incomeStatement: {
+              income: pnl.income || 0,
+              expenses: pnl.expenses || 0,
+              netProfit: (pnl.income || 0) - (pnl.expenses || 0)
+            },
+            balanceSheet: { assets: 0, liabilities: 0, equity: 0 }
+          };
+
+          balances.forEach(b => {
+            if (b.type === 'Asset') report.balanceSheet.assets = b.balance;
+            if (b.type === 'Liability') report.balanceSheet.liabilities = b.balance;
+            if (b.type === 'Equity') report.balanceSheet.equity = b.balance;
+          });
+
+          // Simplified: Equity should also include Retained Earnings (all previous net profit)
+          // For this app, we'll assume the distribution records moving profit to equity.
+
+          event.reply("financial-reports-data", report);
+        }
+      );
     }
+  );
+});
+
+// Process Profit Distribution
+ipcMain.on("process-distribution", (event, data) => {
+  const { business_id, month, year, s40, k40, e20 } = data;
+  const date = `${year}-${String(month).padStart(2, '0')}-01`;
+
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
+
+    const ensureAccount = (name, type, cb) => {
+      db.get("SELECT id FROM accounts WHERE name = ? AND business_id = ?", [name, business_id], (err, row) => {
+        if (row) cb(row.id);
+        else {
+          db.run("INSERT INTO accounts (business_id, name, type) VALUES (?, ?, ?)", [business_id, name, type], function (e) {
+            cb(this.lastID);
+          });
+        }
+      });
+    };
+
+    ensureAccount("Profit Distribution: Saveen", "Equity", (sId) => {
+      ensureAccount("Profit Distribution: Kumudesh", "Equity", (kId) => {
+        ensureAccount("Retained Earnings / Reinvestment", "Equity", (eId) => {
+          const stmt = db.prepare("INSERT INTO transactions (business_id, date, description, amount, type, account_id) VALUES (?, ?, ?, ?, 'Expense', ?)");
+          stmt.run(business_id, date, `Profit Distribution: Saveen (40%)`, s40, sId);
+          stmt.run(business_id, date, `Profit Distribution: Kumudesh (40%)`, k40, kId);
+          stmt.run(business_id, date, `Profit Distribution: Reinvestment (20%)`, e20, eId);
+          stmt.finalize((err) => {
+            if (err) { db.run("ROLLBACK"); } else {
+              db.run("COMMIT");
+              event.reply("distribution-processed");
+            }
+          });
+        });
+      });
+    });
   });
 });
 
@@ -659,6 +762,13 @@ ipcMain.on("get-products", (event, businessId) => {
   });
 });
 
+// Get Product by ID
+ipcMain.on("get-product-by-id", (event, id) => {
+  db.get("SELECT * FROM products WHERE id = ?", [id], (err, row) => {
+    event.reply("product-data", row || null);
+  });
+});
+
 // Save Product
 ipcMain.on("save-product", (event, prod) => {
   const { business_id, name, type, price, description } = prod;
@@ -739,6 +849,237 @@ ipcMain.on("restore-data", async (event) => {
       });
     });
   }
+});
+
+/* =====================================================
+   TASKS IPC
+===================================================== */
+
+// Get Client Tasks
+ipcMain.on("get-client-tasks", (event, clientId) => {
+  db.all(
+    `SELECT * FROM tasks WHERE client_id = ? ORDER BY status DESC, created_at DESC`,
+    [clientId],
+    (err, rows) => {
+      if (err) {
+        console.error("❌ Failed to fetch client tasks:", err.message);
+      } else {
+        event.reply("client-tasks-data", rows);
+      }
+    }
+  );
+});
+
+// Save Task
+ipcMain.on("save-task", (event, task) => {
+  const { id, business_id, client_id, title, description, due_date, status } = task;
+  if (id) {
+    db.run(
+      `UPDATE tasks SET title = ?, description = ?, due_date = ?, status = ? WHERE id = ?`,
+      [title, description, due_date, status, id],
+      (err) => {
+        if (err) console.error("❌ Failed to update task:", err.message);
+        else event.reply("task-saved");
+      }
+    );
+  } else {
+    db.run(
+      `INSERT INTO tasks (business_id, client_id, title, description, due_date)
+       VALUES (?, ?, ?, ?, ?)`,
+      [business_id, client_id, title, description, due_date],
+      function (err) {
+        if (err) console.error("❌ Failed to save task:", err.message);
+        else event.reply("task-saved");
+      }
+    );
+  }
+});
+
+// Update Task Status
+ipcMain.on("update-task-status", (event, data) => {
+  const { id, status } = data;
+  db.run(`UPDATE tasks SET status = ? WHERE id = ?`, [status, id], (err) => {
+    if (err) console.error("❌ Failed to update task status:", err.message);
+    else event.reply("task-saved");
+  });
+});
+
+// Delete Task
+ipcMain.on("delete-task", (event, id) => {
+  db.run(`DELETE FROM tasks WHERE id = ?`, [id], (err) => {
+    if (err) console.error("❌ Failed to delete task:", err.message);
+    else event.reply("task-deleted");
+  });
+});
+
+/* =====================================================
+   CONTENT OPS OS IPC
+===================================================== */
+
+// Save/Update Content Item
+ipcMain.on("save-content", (event, item) => {
+  const { id, client_id, platform, title, caption, hashtags, status, scheduled_date, cta_hook, media_path, notes } = item;
+  if (id && id !== "") {
+    db.run(
+      `UPDATE content_items SET platform = ?, title = ?, caption = ?, hashtags = ?, scheduled_date = ?, cta_hook = ?, media_path = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [platform, title, caption, hashtags, scheduled_date, cta_hook, media_path, notes, id],
+      function (err) {
+        if (err) {
+          console.error("❌ Failed to update content:", err.message);
+          event.reply("content-saved", { error: err.message });
+        } else {
+          db.run(`INSERT INTO content_activities (content_id, action) VALUES (?, ?)`, [id, "Content updated"]);
+          event.reply("content-saved", { success: true });
+        }
+      }
+    );
+  } else {
+    db.run(
+      `INSERT INTO content_items (client_id, platform, title, caption, hashtags, status, scheduled_date, cta_hook, media_path, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [client_id, platform, title, caption, hashtags, status || 'IDEA', scheduled_date, cta_hook, media_path, notes],
+      function (err) {
+        if (err) {
+          console.error("❌ Failed to save content:", err.message);
+          event.reply("content-saved", { error: err.message });
+        } else {
+          const newId = this.lastID;
+          db.run(`INSERT INTO content_activities (content_id, action) VALUES (?, ?)`, [newId, "Content created"]);
+          event.reply("content-saved", { success: true });
+        }
+      }
+    );
+  }
+});
+
+// Get Content by Client (with Month/Year filters)
+ipcMain.on("get-content-by-client", (event, data) => {
+  const { clientId, month, year } = data;
+  let query = `SELECT * FROM content_items WHERE client_id = ?`;
+  const params = [clientId];
+
+  if (month && month !== 'all' && year && year !== 'all') {
+    // Filter by scheduled_date (formatted as YYYY-MM-DD)
+    query += ` AND strftime('%m', scheduled_date) = ? AND strftime('%Y', scheduled_date) = ?`;
+    params.push(month.toString().padStart(2, '0'), year.toString());
+  }
+
+  query += ` ORDER BY scheduled_date ASC, created_at DESC`;
+
+  db.all(query, params, (err, rows) => {
+    if (err) console.error("❌ Failed to fetch client content:", err.message);
+    else event.reply("content-items-data", rows);
+  }
+  );
+});
+
+// Get Content by ID
+ipcMain.on("get-content-by-id", (event, id) => {
+  db.get(`SELECT * FROM content_items WHERE id = ?`, [id], (err, row) => {
+    if (err) console.error("❌ Failed to fetch content item:", err.message);
+    else event.reply("content-item-data", row);
+  });
+});
+
+// Update Content Status
+ipcMain.on("update-content-status", (event, data) => {
+  const { id, status } = data;
+  const postedAt = status === 'POSTED' ? new Date().toISOString().split('T')[0] : null;
+
+  db.run(
+    `UPDATE content_items SET status = ?, posted_date = COALESCE(?, posted_date), updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+    [status, postedAt, id],
+    function (err) {
+      if (err) console.error("❌ Failed to update content status:", err.message);
+      else {
+        db.run(`INSERT INTO content_activities (content_id, action) VALUES (?, ?)`, [id, `Status changed to ${status}`]);
+        event.reply("content-saved"); // Trigger refresh
+      }
+    }
+  );
+});
+
+// Delete Content Item
+ipcMain.on("delete-content", (event, id) => {
+  db.run(`DELETE FROM content_items WHERE id = ?`, [id], (err) => {
+    if (err) console.error("❌ Failed to delete content item:", err.message);
+    else event.reply("content-deleted");
+  });
+});
+
+// Get Content Activity
+ipcMain.on("get-content-activity", (event, contentId) => {
+  db.all(
+    `SELECT * FROM content_activities WHERE content_id = ? ORDER BY created_at DESC`,
+    [contentId],
+    (err, rows) => {
+      if (err) console.error("❌ Failed to fetch activity:", err.message);
+      else event.reply("content-activity-data", rows);
+    }
+  );
+});
+
+// Select Media File
+ipcMain.on("select-content-media", async (event) => {
+  const { filePaths } = await dialog.showOpenDialog({
+    title: 'Select Media Attachment',
+    filters: [
+      { name: 'Images', extensions: ['jpg', 'png', 'gif', 'webp'] },
+      { name: 'Videos', extensions: ['mp4', 'mov', 'avi'] }
+    ],
+    properties: ['openFile']
+  });
+
+  if (filePaths && filePaths.length > 0) {
+    event.reply("media-selected", filePaths[0]);
+  }
+});
+
+// Library: Captions
+ipcMain.on("save-caption", (event, data) => {
+  const { client_id, platform, caption, tags } = data;
+  db.run(
+    `INSERT INTO caption_library (client_id, platform, caption, tags) VALUES (?, ?, ?, ?)`,
+    [client_id, platform, caption, tags],
+    (err) => {
+      if (err) console.error("❌ Failed to save caption:", err.message);
+      else event.reply("library-updated");
+    }
+  );
+});
+
+ipcMain.on("get-captions", (event, clientId) => {
+  db.all(
+    `SELECT * FROM caption_library WHERE client_id IS NULL OR client_id = ? ORDER BY created_at DESC`,
+    [clientId],
+    (err, rows) => {
+      if (err) console.error("❌ Failed to fetch captions:", err.message);
+      else event.reply("captions-data", rows);
+    }
+  );
+});
+
+// Library: Hashtags
+ipcMain.on("save-hashtags", (event, data) => {
+  const { client_id, platform, hashtags } = data;
+  db.run(
+    `INSERT INTO hashtag_sets (client_id, platform, hashtags) VALUES (?, ?, ?)`,
+    [client_id, platform, hashtags],
+    (err) => {
+      if (err) console.error("❌ Failed to save hashtags:", err.message);
+      else event.reply("library-updated");
+    }
+  );
+});
+
+ipcMain.on("get-hashtags", (event, clientId) => {
+  db.all(
+    `SELECT * FROM hashtag_sets WHERE client_id IS NULL OR client_id = ? ORDER BY created_at DESC`,
+    [clientId],
+    (err, rows) => {
+      if (err) console.error("❌ Failed to fetch hashtags:", err.message);
+      else event.reply("hashtags-data", rows);
+    }
+  );
 });
 
 /* =====================================================
